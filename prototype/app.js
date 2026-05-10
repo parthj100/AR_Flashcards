@@ -3,6 +3,42 @@ const D = window.LENS_DATA;
 const $ = (sel, root = document) => root.querySelector(sel);
 const el = (html) => { const t = document.createElement('template'); t.innerHTML = html.trim(); return t.content.firstElementChild; };
 
+// Runtime state (outlives view mounts)
+const RT = window.LENS_RUNTIME = window.LENS_RUNTIME || {
+  mlReady: false,       // true once CLIP has downloaded and indexed vocab
+  mlError: null,        // string error if ML failed to init
+  ollamaOk: false,      // true after a successful Ollama health check
+  generatedCards: {},   // id -> flashcard object produced by LLM
+  scan: null,           // active scan controller (camera + loop)
+};
+
+// Build the full vocabulary CLIP should recognize = hand-authored flashcards
+// that have clipPrompts[] + extendedVocab entries. Returned in a flat shape.
+function buildVocabulary() {
+  const vocab = [];
+  for (const [id, card] of Object.entries(D.flashcards)) {
+    if (Array.isArray(card.clipPrompts) && card.clipPrompts.length) {
+      vocab.push({ id, prompts: card.clipPrompts });
+    }
+  }
+  for (const v of (D.extendedVocab || [])) {
+    vocab.push({ id: v.id, prompts: v.prompts });
+  }
+  return vocab;
+}
+
+// Look up a vocabulary entry by id. Returns a unified shape regardless of
+// whether it came from flashcards{} or extendedVocab[].
+function vocabMeta(id) {
+  if (D.flashcards[id]) {
+    const c = D.flashcards[id];
+    return { id, displayName: c.name, subject: c.subject, grad: c.grad, kind: 'authored' };
+  }
+  const v = (D.extendedVocab || []).find(x => x.id === id);
+  if (v) return { id, displayName: v.displayName, subject: v.subject, grad: v.grad, kind: 'extended' };
+  return null;
+}
+
 // Each deck opens to a representative flashcard. Edit here to add more.
 const DECK_TO_CARD = {
   'chem-101':     'copper-sulfate',
@@ -37,7 +73,14 @@ function navigate(hash) {
   window.location.hash = hash;
 }
 
-window.addEventListener('hashchange', mount);
+window.addEventListener('hashchange', () => {
+  // Stop the camera if we're leaving the scan view
+  if (window.location.hash !== '#scan' && RT.scan) {
+    try { RT.scan.stop(); } catch (_) {}
+    RT.scan = null;
+  }
+  mount();
+});
 window.addEventListener('DOMContentLoaded', mount);
 
 function mount() {
@@ -291,19 +334,18 @@ function renderDecks(root) {
   }));
 }
 
-// ---------- Scan (W2) ----------
+// ---------- Scan (W2) — real CLIP + Ollama pipeline ----------
 function renderScan(root) {
-  // pick a "current" specimen from recents
-  const current = D.recentScans[0]; // copper sulfate
-  const alts = [
-    { mark: 'Cl', name: 'Cobalt chloride', formula: 'CoCl₂',          pct: '5%' },
-    { mark: 'Az', name: 'Azurite',         formula: 'Cu₃(CO₃)₂(OH)₂', pct: '2%' },
-  ];
+  // Stop any prior scan controller before mounting fresh UI
+  if (RT.scan) { try { RT.scan.stop(); } catch (_) {} RT.scan = null; }
 
   root.innerHTML = `
     <div class="scan-page">
       <section class="scan-stage">
         <div class="scan-backdrop"></div>
+
+        <video id="scan-video" class="scan-video" autoplay muted playsinline></video>
+        <div class="scan-vignette"></div>
 
         <div class="scan-top">
           <button class="back" data-route="#dashboard">${ico('chev-left')} Back</button>
@@ -311,8 +353,8 @@ function renderScan(root) {
           <div class="scoping">Scanning to</div>
           <div class="deck-pill-dark"><span class="dot"></span>Chem 101 ${ico('chev-down')}</div>
           <div class="right-tools">
-            <span class="tool-pill"><span class="live"></span>Auto-detect</span>
-            <span class="tool-pill">${ico('bolt')} Flash off</span>
+            <span class="tool-pill" id="ml-status"><span class="live" id="ml-dot"></span><span id="ml-text">Starting…</span></span>
+            <span class="tool-pill" id="llm-status"><span class="live" id="llm-dot" style="background:#8B8B86;box-shadow:none"></span><span id="llm-text">LLM</span></span>
             <button class="tool-pill close" data-route="#dashboard">${ico('x')}</button>
           </div>
         </div>
@@ -322,22 +364,18 @@ function renderScan(root) {
           <span class="corner tr"></span>
           <span class="corner bl"></span>
           <span class="corner br"></span>
-          <div class="specimen">
-            <div class="blob"></div>
-            <div class="focal"></div>
-          </div>
         </div>
 
-        <div class="scan-detection-pill">
+        <div class="scan-detection-pill" id="detection-pill" hidden>
           <span class="check">${ico('check')}</span>
-          <span>Copper sulfate</span>
-          <span class="pct">92%</span>
+          <span id="detection-name">—</span>
+          <span class="pct" id="detection-pct">0%</span>
           <span class="stem"></span>
         </div>
 
         <div class="scan-bottom">
-          <div class="recognized">Recognized — press space or click to capture</div>
-          <div class="formula">CuSO4 · 5H2O</div>
+          <div class="recognized" id="scan-hint">Point the camera at an object and press space to capture</div>
+          <div class="formula" id="scan-formula">—</div>
           <div class="capture-row">
             <div class="capture-aux">
               <button class="icon-btn" title="Upload">${ico('image')}</button>
@@ -358,93 +396,338 @@ function renderScan(root) {
       <aside class="detection-panel">
         <div class="live-label">Live detection</div>
         <div>
-          <div class="detection-name">Copper sulfate</div>
-          <div class="detection-formula">
-            <span class="strong">CuSO₄</span><span>·</span><span class="strong">5H₂O</span><span>·</span><span>inorganic salt</span>
+          <div class="detection-name" id="panel-name">Warming up…</div>
+          <div class="detection-formula" id="panel-sub">
+            <span>loading CLIP model</span>
           </div>
         </div>
         <div>
           <div class="confidence-row">
             <span class="label">Confidence</span>
-            <span class="v" id="confidence-pct">92%</span>
+            <span class="v" id="confidence-pct">—</span>
           </div>
-          <div class="confidence-bar"><span id="confidence-fill" style="width:92%"></span></div>
+          <div class="confidence-bar"><span id="confidence-fill" style="width:0%"></span></div>
         </div>
 
         <div class="alt-section">
           <div class="alt-label">Other possibilities</div>
-          ${alts.map(a => `
+          <div id="alt-list">
             <div class="alt-row">
-              <div class="alt-mark">${a.mark}</div>
+              <div class="alt-mark">··</div>
               <div class="alt-info">
-                <div class="alt-name">${a.name}</div>
-                <div class="alt-sub">${a.formula}</div>
+                <div class="alt-name" style="color:var(--muted)">Waiting for first frame</div>
+                <div class="alt-sub">Camera + model load</div>
               </div>
-              <div class="alt-pct">${a.pct}</div>
-            </div>`).join('')}
-          <div class="alt-row">
-            <div class="alt-mark">??</div>
-            <div class="alt-info">
-              <div class="alt-name">Not what you mean?</div>
-              <div class="alt-sub" style="font-family:var(--font-sans)">Type it manually</div>
             </div>
-            <span class="arrow">${ico('chev-right')}</span>
-          </div>
-        </div>
-
-        <div class="session-row">
-          <div class="label-line">
-            <span class="l">This session</span>
-            <span class="v">3 captures</span>
-          </div>
-          <div class="session-thumbs">
-            <div class="session-thumb" style="background:var(--grad-orange)"><span class="name">Mito.</span></div>
-            <div class="session-thumb" style="background:var(--grad-arch)"><span class="name">Hagia</span></div>
-            <div class="session-thumb" style="background:var(--grad-amber)"><span class="name">Maple</span></div>
           </div>
         </div>
 
         <div class="tip-card">
-          <div class="head">When you capture</div>
-          <div class="body">Lens will generate a flashcard with definition, key facts, and quiz prompts.</div>
-          <div class="foot">Card saves to Chem 101 automatically.</div>
+          <div class="head" id="pipeline-head">Pipeline</div>
+          <div class="body" id="pipeline-body">CLIP (Xenova/clip-vit-base-patch32) matches the camera feed against ${buildVocabulary().length} topics. Capture triggers Phi-3 via Ollama to write the flashcard.</div>
+          <div class="foot" id="pipeline-foot">Loading models…</div>
         </div>
       </aside>
     </div>`;
 
-  // Capture interaction → simulate detection then go to the flashcard
-  const capture = () => {
-    const btn = $('#capture-btn', root);
-    if (!btn) return;
-    btn.style.transform = 'scale(.92)';
-    setTimeout(() => { btn.style.transform = ''; }, 120);
-    setTimeout(() => navigate('#flashcard?id=copper-sulfate'), 200);
+  // --- Kick off the async controller (camera + CLIP + loop) ---
+  startScanController(root).catch(err => {
+    console.error('[scan] fatal:', err);
+    showScanError(root, err);
+  });
+}
+
+async function startScanController(root) {
+  const ML = window.LensML;
+  if (!ML) {
+    // If <script type="module"> hasn't loaded yet, wait for it
+    await new Promise(resolve => window.addEventListener('lens-ml-ready', resolve, { once: true }));
+  }
+  const { Clip, Llm, Camera } = window.LensML;
+
+  const videoEl  = $('#scan-video', root);
+  const pill     = $('#detection-pill', root);
+  const detName  = $('#detection-name', root);
+  const detPct   = $('#detection-pct', root);
+  const panelName = $('#panel-name', root);
+  const panelSub  = $('#panel-sub', root);
+  const confPct  = $('#confidence-pct', root);
+  const confFill = $('#confidence-fill', root);
+  const altList  = $('#alt-list', root);
+  const scanHint = $('#scan-hint', root);
+  const scanFormula = $('#scan-formula', root);
+  const mlText   = $('#ml-text', root);
+  const mlDot    = $('#ml-dot', root);
+  const llmText  = $('#llm-text', root);
+  const llmDot   = $('#llm-dot', root);
+  const pipeFoot = $('#pipeline-foot', root);
+
+  const setMl = (text, color) => { mlText.textContent = text; if (color) mlDot.style.background = color; };
+  const setLlm = (text, color) => { llmText.textContent = text; llmDot.style.background = color; llmDot.style.boxShadow = color === '#2ecc71' ? '0 0 0 3px rgba(46,204,113,.18)' : 'none'; };
+
+  // 1. Start camera
+  setMl('Opening camera…', '#E5A23A');
+  const cam = new Camera();
+  try {
+    await cam.start(videoEl);
+  } catch (err) {
+    console.error('[camera]', err);
+    setMl('No camera', '#E97352');
+    panelName.textContent = 'Camera unavailable';
+    panelSub.innerHTML = `<span>${cameraErrorMessage(err)}</span>`;
+    pipeFoot.textContent = 'Start the page from https:// or http://localhost so the browser grants camera access.';
+    return;
+  }
+
+  // 2. Load CLIP (first run downloads ~150 MB, cached afterwards by the browser)
+  setMl('Loading CLIP…', '#E5A23A');
+  pipeFoot.textContent = 'Downloading CLIP weights (first run only)…';
+  try {
+    const { device } = await Clip.init({
+      onProgress: ({ message }) => { pipeFoot.textContent = message; },
+    });
+    setMl(`CLIP · ${device}`, '#2ecc71');
+  } catch (err) {
+    console.error('[clip init]', err);
+    setMl('CLIP failed', '#E97352');
+    panelName.textContent = 'Model load failed';
+    panelSub.innerHTML = `<span>${(err.message || err).slice(0, 140)}</span>`;
+    pipeFoot.textContent = 'Check network connection — CLIP weights load from the Hugging Face CDN on first run.';
+    return;
+  }
+
+  // 3. Index vocabulary (fast — runs once and re-runs only if we ever mutate data.js)
+  pipeFoot.textContent = 'Indexing recognition vocabulary…';
+  const vocab = buildVocabulary();
+  await Clip.indexVocabulary(vocab);
+  RT.mlReady = true;
+
+  // 4. Probe Ollama in parallel (non-blocking)
+  checkOllama(llmText, llmDot, pipeFoot);
+
+  // 5. Scoring loop
+  let lastTop = null;
+  let latencyMs = 0;
+  let busy = false;
+
+  const tick = async () => {
+    if (busy) return;
+    busy = true;
+    try {
+      const canvas = cam.captureFrame(224);
+      if (!canvas) return;
+      const t0 = performance.now();
+      const { top, confidence, results, rawScore } = await Clip.scoreCanvas(canvas, { topK: 3 });
+      latencyMs = performance.now() - t0;
+
+      const topMeta = vocabMeta(top.id);
+      if (!topMeta) return; // should never happen
+
+      // Low-confidence gate. CLIP raw cosine for real-world matches tends to
+      // sit in [0.18, 0.32]. Below 0.20 we treat the frame as "nothing in view".
+      const trulyLow = rawScore < 0.20;
+      if (trulyLow) {
+        pill.hidden = true;
+        panelName.textContent = 'No confident match';
+        panelSub.innerHTML = `<span>Point at a distinct object</span><span>·</span><span style="font-family:var(--font-mono)">${latencyMs.toFixed(0)} ms</span>`;
+        confFill.style.width = '0%';
+        confPct.textContent = '—';
+        scanHint.textContent = 'Nothing recognized — move closer or try another object';
+        scanFormula.textContent = '—';
+        altList.innerHTML = renderAlts(results, 0);
+        lastTop = null;
+        return;
+      }
+
+      // Display confidence = softmaxed over top-K (always near 1.0 for the
+      // winner by construction) scaled by the raw cosine as a "quality" factor.
+      const displayPct = Math.round(Math.min(0.99, confidence * Math.min(1, rawScore / 0.30)) * 100);
+
+      pill.hidden = false;
+      detName.textContent = topMeta.displayName;
+      detPct.textContent = displayPct + '%';
+
+      panelName.textContent = topMeta.displayName;
+      panelSub.innerHTML = `
+        <span class="strong">${topMeta.subject || ''}</span>
+        <span>·</span>
+        <span style="font-family:var(--font-mono)">cos ${rawScore.toFixed(2)}</span>
+        <span>·</span>
+        <span style="font-family:var(--font-mono)">${latencyMs.toFixed(0)} ms</span>`;
+      confPct.textContent = displayPct + '%';
+      confFill.style.width = displayPct + '%';
+
+      scanHint.textContent = 'Recognized — press space or click to capture';
+      scanFormula.textContent = topMeta.displayName;
+
+      altList.innerHTML = renderAlts(results, displayPct);
+
+      lastTop = { id: top.id, meta: topMeta, matchedPrompt: top.matchedPrompt, rawScore };
+    } catch (err) {
+      console.warn('[scan tick]', err);
+    } finally {
+      busy = false;
+    }
   };
+
+  const loop = setInterval(tick, 500);
+
+  // 6. Capture handler — either load hand-authored flashcard or ask Phi-3 to write one
+  const capture = async () => {
+    const btn = $('#capture-btn', root);
+    if (btn) { btn.style.transform = 'scale(.92)'; setTimeout(() => btn.style.transform = '', 120); }
+    if (!lastTop) {
+      scanHint.textContent = 'No confident match yet — hold steady';
+      return;
+    }
+
+    const { id, meta, matchedPrompt } = lastTop;
+
+    // 6a. Authored flashcard? Navigate straight to it.
+    if (D.flashcards[id]) {
+      navigate(`#flashcard?id=${id}`);
+      return;
+    }
+
+    // 6b. Generated flashcard cache hit? Navigate.
+    if (RT.generatedCards[id]) {
+      navigate(`#flashcard?id=${id}`);
+      return;
+    }
+
+    // 6c. Otherwise ask Ollama/Phi-3 to write one.
+    if (!RT.ollamaOk) {
+      scanHint.textContent = 'Ollama unreachable — start "ollama serve" then try again';
+      return;
+    }
+
+    showGenOverlay(meta.displayName);
+    try {
+      const flashcard = await Llm.generateFlashcard({
+        topic: meta.displayName,
+        hintPrompt: matchedPrompt,
+      });
+      // Wrap into the shape renderFlashcard expects
+      RT.generatedCards[id] = {
+        id,
+        crumbs: ['Decks', 'Generated'],
+        subject: flashcard.subject || meta.subject,
+        name: flashcard.name,
+        formula: flashcard.formula,
+        mass: flashcard.mass,
+        grad: meta.grad || 'var(--grad-physics)',
+        scanned: 'JUST NOW · LIVE SCAN',
+        reviewWhen: 'Tomorrow',
+        reviewAt: '9:00 AM',
+        reviewProgress: { done: 0, total: 4 },
+        oneline: flashcard.oneline,
+        facts: flashcard.facts,
+        generated: true,
+      };
+      hideGenOverlay();
+      navigate(`#flashcard?id=${id}`);
+    } catch (err) {
+      console.error('[llm]', err);
+      hideGenOverlay();
+      scanHint.textContent = `Generation failed: ${(err.message || err).slice(0, 100)}`;
+    }
+  };
+
   $('#capture-btn', root).addEventListener('click', capture);
 
-  // Animate confidence wobble for liveness
-  let p = 92;
-  const fill = $('#confidence-fill', root);
-  const pct = $('#confidence-pct', root);
-  const wobble = setInterval(() => {
-    p = Math.max(88, Math.min(95, p + (Math.random() * 2 - 1)));
-    fill.style.width = p.toFixed(0) + '%';
-    pct.textContent = p.toFixed(0) + '%';
-  }, 600);
-  // clean up on next mount
-  const obs = new MutationObserver(() => { if (!document.body.contains(fill)) { clearInterval(wobble); obs.disconnect(); }});
-  obs.observe(document.body, { childList: true, subtree: true });
-
-  // Space to capture
-  document.onkeydown = (e) => {
-    if (e.code === 'Space' && !$('#search-overlay').hidden === false) { e.preventDefault(); capture(); }
+  // 7. Register a scan controller so we can tear down on navigate-away
+  RT.scan = {
+    stop: () => {
+      clearInterval(loop);
+      cam.stop();
+    },
+    capture,
   };
+
+  // Space-to-capture (installs over attachGlobalKeys's handler for the scan view).
+  // attachGlobalKeys() also looks up #capture-btn and clicks it, so this is belt+braces.
+}
+
+function renderAlts(results, topDisplayPct) {
+  if (!results || results.length <= 1) {
+    return `<div class="alt-row"><div class="alt-mark">··</div><div class="alt-info"><div class="alt-name" style="color:var(--muted)">No alternatives</div></div></div>`;
+  }
+  // Skip index 0 (the winner) and show the rest
+  return results.slice(1).map((r, idx) => {
+    const m = vocabMeta(r.id);
+    if (!m) return '';
+    const pct = Math.round(r.confidence * (topDisplayPct / 100) * 100);
+    const mark = (m.displayName || '??').slice(0, 2);
+    return `
+      <div class="alt-row">
+        <div class="alt-mark">${escapeHtml(mark)}</div>
+        <div class="alt-info">
+          <div class="alt-name">${escapeHtml(m.displayName)}</div>
+          <div class="alt-sub">${escapeHtml(m.subject || '')}</div>
+        </div>
+        <div class="alt-pct">${pct}%</div>
+      </div>`;
+  }).join('');
+}
+
+function escapeHtml(s) { return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;','\'':'&#39;'}[c])); }
+
+function cameraErrorMessage(err) {
+  switch (err.code) {
+    case 'denied':      return 'Camera permission denied — grant access and reload.';
+    case 'no-device':   return 'No camera detected on this device.';
+    case 'unsupported': return 'Camera requires HTTPS or http://localhost.';
+    default:            return err.message || 'Camera unavailable.';
+  }
+}
+
+async function checkOllama(llmText, llmDot, pipeFoot) {
+  const { Llm } = window.LensML;
+  try {
+    const h = await Llm.health();
+    if (h.ok) {
+      RT.ollamaOk = true;
+      llmText.textContent = h.hasConfiguredModel ? 'Phi-3 · ready' : `Phi-3 · pull ${Llm.getConfig().model}`;
+      llmDot.style.background = h.hasConfiguredModel ? '#2ecc71' : '#E5A23A';
+      llmDot.style.boxShadow = h.hasConfiguredModel ? '0 0 0 3px rgba(46,204,113,.18)' : 'none';
+      if (h.hasConfiguredModel) {
+        if (pipeFoot) pipeFoot.textContent = `${Llm.getConfig().model} will write a flashcard on capture.`;
+      } else {
+        if (pipeFoot) pipeFoot.textContent = `Ollama is running, but \`${Llm.getConfig().model}\` isn't installed. Run: ollama pull ${Llm.getConfig().model}`;
+      }
+    } else {
+      RT.ollamaOk = false;
+      llmText.textContent = 'LLM offline';
+      llmDot.style.background = '#8B8B86';
+      llmDot.style.boxShadow = 'none';
+      if (pipeFoot) pipeFoot.textContent = 'Ollama not reachable at localhost:11434. Known flashcards still work.';
+    }
+  } catch (err) {
+    RT.ollamaOk = false;
+    llmText.textContent = 'LLM offline';
+  }
+}
+
+function showGenOverlay(topic) {
+  const ov = document.getElementById('gen-overlay');
+  document.getElementById('gen-topic').textContent = topic;
+  document.getElementById('gen-sub').textContent = 'Phi-3 is composing the explanation and key facts.';
+  ov.hidden = false;
+}
+function hideGenOverlay() {
+  const ov = document.getElementById('gen-overlay');
+  if (ov) ov.hidden = true;
+}
+
+function showScanError(root, err) {
+  const hint = $('#scan-hint', root);
+  if (hint) hint.textContent = `Error: ${err.message || err}`;
 }
 
 // ---------- Flashcard detail (W3) ----------
 function renderFlashcard(root, params) {
   const id = params.get('id') || 'copper-sulfate';
-  const card = D.flashcards[id] || D.flashcards['copper-sulfate'];
+  const card = D.flashcards[id] || RT.generatedCards[id] || D.flashcards['copper-sulfate'];
 
   const right = `
     <button class="btn">${ico('share')} Share</button>

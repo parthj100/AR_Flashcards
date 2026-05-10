@@ -24,7 +24,29 @@
     </div>
   </div>
 
+  <!-- Generation overlay shown while Ollama is writing a flashcard -->
+  <div id="gen-overlay" class="gen-overlay" hidden>
+    <div class="gen-card">
+      <div class="gen-spinner"></div>
+      <div class="gen-head">Writing flashcard</div>
+      <div class="gen-topic" id="gen-topic">…</div>
+      <div class="gen-sub" id="gen-sub">Phi-3 is composing the explanation and key facts.</div>
+    </div>
+  </div>
+
+  <!-- Mock data first (legacy scripts read window.LENS_DATA) -->
   <script src="data.js"></script>
   <script src="app.js"></script>
+
+  <!-- ML modules — loaded as ES modules, kick off model init after app.js mounts -->
+  <script type="module">
+    import * as Clip from './lib/clip.js';
+    import * as Llm  from './lib/llm.js';
+    import { Camera } from './lib/camera.js';
+
+    // Expose to the global scope so app.js (non-module) can use them.
+    window.LensML = { Clip, Llm, Camera };
+    window.dispatchEvent(new CustomEvent('lens-ml-ready'));
+  </script>
 </body>
 </html>
