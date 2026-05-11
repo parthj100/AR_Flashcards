@@ -1,0 +1,32 @@
+# Editor / OS
+.DS_Store
+.vscode/
+.idea/
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+
+# Virtualenvs
+.venv/
+venv/
+env/
+
+# YOLO / ML weights — regenerated on demand
+*.pt
+*.onnx
+*.engine
+
+# Scraped third-party images (regenerable via collect_dataset.py; not
+# redistributed under the project's license)
+YOLOv8-Detection/dataset/images/raw/
+YOLOv8-Detection/dataset/images/train/
+YOLOv8-Detection/dataset/images/val/
+YOLOv8-Detection/dataset/images/test/
+YOLOv8-Detection/dataset/labels/
+
+# Ultralytics / Roboflow run artifacts
+runs/
+wandb/

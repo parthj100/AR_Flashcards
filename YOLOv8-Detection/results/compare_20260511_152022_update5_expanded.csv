@@ -1,0 +1,13 @@
+model,class,images,avg_ms,p50_ms,p95_ms,fps,avg_dets,avg_conf
+yolov8n.pt,backpack,97,81.37,42.59,256.6,12.29,3.94,0.5111
+yolov8n.pt,calculator,88,40.16,30.97,61.51,24.9,2.3,0.5208
+yolov8n.pt,globe_model,96,37.2,34.03,58.96,26.88,3.95,0.4952
+yolov8n.pt,microscope,99,33.04,30.38,51.93,30.27,3.18,0.514
+yolov8n.pt,periodic_table_poster,78,35.27,32.09,48.59,28.35,1.4,0.4644
+yolov8n.pt,safety_goggles,96,29.41,28.51,45.17,34.0,2.72,0.5658
+yolov8s.pt,backpack,97,77.46,43.4,300.18,12.91,5.63,0.5364
+yolov8s.pt,calculator,88,55.33,46.32,76.56,18.07,2.49,0.5938
+yolov8s.pt,globe_model,96,52.82,48.16,85.66,18.93,4.42,0.513
+yolov8s.pt,microscope,99,48.1,46.06,64.89,20.79,3.75,0.5695
+yolov8s.pt,periodic_table_poster,78,53.73,50.4,78.05,18.61,1.54,0.5247
+yolov8s.pt,safety_goggles,96,45.39,43.58,63.38,22.03,3.45,0.5984
