@@ -383,6 +383,323 @@ window.LENS_DATA = {
         { num: '03', label: 'MAGNETOSPHERE',  body: 'Strongest in the solar system after the Sun \u2014 14\u00d7 Earth\u2019s field at the cloud tops.' },
         { num: '04', label: 'GALILEAN MOONS', body: 'Io, Europa, Ganymede, Callisto \u2014 discovered by Galileo in 1610; Ganymede is larger than Mercury.' }
       ]
+    },
+
+    // ---------------------------------------------------------------------
+    // Authored flashcards added in Update 5 — broaden the expert demonstration
+    // set for the imitation-learning framing, and give the closed-set CLIP
+    // evaluation more coverage beyond the original 13 entries.
+    // ---------------------------------------------------------------------
+
+    'sodium-chloride': {
+      id: 'sodium-chloride',
+      crumbs: ['Decks', 'Chem 101'],
+      subject: 'CHEMISTRY \u00b7 INORGANIC \u00b7 IONIC SALT',
+      name: 'Sodium chloride',
+      formula: 'NaCl',
+      mass: 'M = 58.44 g/mol',
+      grad: 'var(--grad-arch)',
+      scanned: 'SCANNED 2 DAYS AGO',
+      reviewWhen: 'Thursday',
+      reviewAt: '10:00 AM',
+      reviewProgress: { done: 2, total: 5 },
+      clipPrompts: [
+        'a photo of sodium chloride rock salt crystals',
+        'a cubic halite crystal specimen',
+        'white translucent salt crystals on a dark surface',
+      ],
+      oneline: 'The prototypical ionic compound \u2014 a face-centered-cubic lattice of Na\u207a and Cl\u207b held by electrostatic attraction; essential to biology as the dominant extracellular electrolyte.',
+      facts: [
+        { num: '01', label: 'CRYSTAL STRUCTURE', body: 'Rock-salt (FCC) structure \u2014 each ion coordinated by six opposite-charge neighbours.' },
+        { num: '02', label: 'MELTING POINT',     body: '801 \u00b0C \u2014 reflects the high lattice energy of \u22124.1 eV per ion pair.' },
+        { num: '03', label: 'PHYSIOLOGY',        body: 'Na\u207a/K\u207a-ATPase maintains a 10\u00d7 gradient across cell membranes \u2014 the basis of neuronal action potentials.' },
+        { num: '04', label: 'INDUSTRIAL USE',    body: 'Feedstock for the chlor-alkali process \u2014 NaOH, Cl\u2082, and H\u2082 by electrolysis of brine.' }
+      ]
+    },
+
+    'photosynthesis': {
+      id: 'photosynthesis',
+      crumbs: ['Decks', 'Biology'],
+      subject: 'BIOLOGY \u00b7 METABOLISM \u00b7 LIGHT-DEPENDENT',
+      name: 'Photosynthesis',
+      formula: '6 CO\u2082 + 6 H\u2082O \u2192 C\u2086H\u2081\u2082O\u2086 + 6 O\u2082',
+      mass: '\u0394G\u00b0 \u2248 +2872 kJ/mol',
+      grad: 'var(--grad-green)',
+      scanned: 'SCANNED 3 DAYS AGO',
+      reviewWhen: 'Today',
+      reviewAt: '4:30 PM',
+      reviewProgress: { done: 0, total: 5 },
+      clipPrompts: [
+        'a biology diagram of photosynthesis in a chloroplast',
+        'a textbook illustration of the light-dependent and Calvin cycle reactions',
+        'a diagram of a leaf cross section showing chloroplasts',
+      ],
+      oneline: 'Light-driven reduction of CO\u2082 to sugar in the chloroplast \u2014 the planetary source of free O\u2082 and the upstream energetics of nearly every food web on Earth.',
+      facts: [
+        { num: '01', label: 'LIGHT REACTIONS', body: 'Thylakoid photosystems II and I split water, pump H\u207a, and reduce NADP\u207a using photons.' },
+        { num: '02', label: 'CALVIN CYCLE',    body: 'Stromal carbon fixation by RuBisCO \u2014 the most abundant protein on Earth; fixes CO\u2082 onto RuBP.' },
+        { num: '03', label: 'NET ENERGETICS',  body: '~ 8 photons per O\u2082 at the theoretical minimum; real leaves achieve 1\u20134% light-to-biomass efficiency.' },
+        { num: '04', label: 'VARIANTS',        body: 'C\u2083, C\u2084, and CAM pathways trade water use against heat tolerance \u2014 grasses vs. cacti vs. corn.' }
+      ]
+    },
+
+    'cell-membrane': {
+      id: 'cell-membrane',
+      crumbs: ['Decks', 'Cell unit'],
+      subject: 'BIOLOGY \u00b7 STRUCTURE \u00b7 MEMBRANE',
+      name: 'Cell membrane',
+      formula: 'Lipid bilayer',
+      mass: '\u2248 5 nm thick',
+      grad: 'var(--grad-orange)',
+      scanned: 'SCANNED 5 DAYS AGO',
+      reviewWhen: 'Friday',
+      reviewAt: '11:15 AM',
+      reviewProgress: { done: 1, total: 4 },
+      clipPrompts: [
+        'a diagram of the cell membrane phospholipid bilayer',
+        'a fluid mosaic model illustration with embedded proteins',
+        'a textbook cross-section of a plasma membrane',
+      ],
+      oneline: 'A self-assembling phospholipid bilayer that partitions the cell from its environment \u2014 described by the fluid-mosaic model; selective permeability defines the boundary of life.',
+      facts: [
+        { num: '01', label: 'COMPOSITION',     body: 'Phospholipids (phosphatidylcholine dominant), cholesterol, and integral/peripheral proteins.' },
+        { num: '02', label: 'FLUID MOSAIC',    body: 'Lateral diffusion of lipids and proteins on a 2-D fluid plane \u2014 Singer & Nicolson, 1972.' },
+        { num: '03', label: 'TRANSPORT',       body: 'Passive (simple, facilitated, osmosis) vs. active (ATP-driven pumps, secondary cotransport).' },
+        { num: '04', label: 'SIGNALING',       body: 'Receptors (GPCRs, RTKs) convert extracellular ligands into intracellular second messengers.' }
+      ]
+    },
+
+    'neuron': {
+      id: 'neuron',
+      crumbs: ['Decks', 'Biology'],
+      subject: 'BIOLOGY \u00b7 ANATOMY \u00b7 NERVOUS SYSTEM',
+      name: 'Neuron',
+      formula: 'V_rest \u2248 \u221270 mV',
+      mass: '86 billion in human brain',
+      grad: 'var(--grad-orange)',
+      scanned: 'SCANNED 6 DAYS AGO',
+      reviewWhen: 'Saturday',
+      reviewAt: '9:00 AM',
+      reviewProgress: { done: 2, total: 6 },
+      clipPrompts: [
+        'a neuron diagram with dendrites, axon, and synapse',
+        'a textbook illustration of a motor neuron',
+        'a microscopy image of a stained pyramidal neuron',
+      ],
+      oneline: 'The signaling cell of the nervous system \u2014 integrates thousands of synaptic inputs into a graded membrane potential and fires an all-or-none action potential along its axon.',
+      facts: [
+        { num: '01', label: 'MORPHOLOGY',   body: 'Dendrites receive, soma integrates, axon conducts, terminal boutons release.' },
+        { num: '02', label: 'ACTION POTENTIAL', body: 'Na\u207a influx depolarizes past \u221255 mV threshold; K\u207a efflux repolarizes; 1 ms spike, 2 ms refractory.' },
+        { num: '03', label: 'SYNAPSE',      body: 'Chemical transmission via vesicular neurotransmitters; electrical synapses via gap junctions in fast circuits.' },
+        { num: '04', label: 'MYELINATION',  body: 'Oligodendrocytes/Schwann cells insulate the axon \u2014 saltatory conduction, 100\u00d7 speed-up.' }
+      ]
+    },
+
+    'dna': {
+      id: 'dna',
+      crumbs: ['Decks', 'Biology'],
+      subject: 'BIOLOGY \u00b7 MOLECULAR \u00b7 NUCLEIC ACID',
+      name: 'DNA',
+      formula: '(dA, dT, dG, dC)',
+      mass: '~ 3.2 billion bp (human)',
+      grad: 'var(--grad-violet)',
+      scanned: 'SCANNED 7 DAYS AGO',
+      reviewWhen: 'Sunday',
+      reviewAt: '3:45 PM',
+      reviewProgress: { done: 3, total: 6 },
+      clipPrompts: [
+        'a 3D model of the DNA double helix',
+        'a textbook illustration of DNA base pairing',
+        'a cartoon diagram of DNA replication',
+      ],
+      oneline: 'The antiparallel right-handed double helix that encodes hereditary information \u2014 Watson\u2013Crick base pairing between purines and pyrimidines across 10.5 bp per helical turn.',
+      facts: [
+        { num: '01', label: 'BASE PAIRING',   body: 'A=T via two H-bonds; G\u2261C via three H-bonds \u2014 asymmetric energies drive melting temperature.' },
+        { num: '02', label: 'STRUCTURE',      body: 'Sugar-phosphate backbone outside, base pairs inside; 2 nm diameter, 3.4 nm per turn.' },
+        { num: '03', label: 'REPLICATION',    body: 'Semiconservative: each new double helix keeps one parent strand (Meselson\u2013Stahl, 1958).' },
+        { num: '04', label: 'CENTRAL DOGMA',  body: 'DNA \u2192 RNA \u2192 Protein \u2014 Crick, 1958; reverse transcription in retroviruses.' }
+      ]
+    },
+
+    'graphite': {
+      id: 'graphite',
+      crumbs: ['Decks', 'Mineral ID'],
+      subject: 'GEOLOGY \u00b7 CARBON ALLOTROPE',
+      name: 'Graphite',
+      formula: 'C',
+      mass: 'Hardness 1\u20132  \u00b7  \u03c1 = 2.26 g/cm\u00b3',
+      grad: 'var(--grad-astro)',
+      scanned: 'SCANNED 8 DAYS AGO',
+      reviewWhen: 'Monday',
+      reviewAt: '2:00 PM',
+      reviewProgress: { done: 1, total: 4 },
+      clipPrompts: [
+        'a photo of a graphite mineral sample',
+        'a flaky grey-black graphite rock',
+        'a close-up of a pencil lead cross-section',
+      ],
+      oneline: 'A layered allotrope of carbon \u2014 sp\u00b2-hybridized sheets of hexagonal rings held laterally by weak van der Waals forces, making it electrically conductive and mechanically soft.',
+      facts: [
+        { num: '01', label: 'STRUCTURE',    body: 'Parallel sheets of hexagonal carbon (graphene layers) stacked 0.335 nm apart.' },
+        { num: '02', label: 'CLEAVAGE',     body: 'Perfect basal \u2014 sheets slide past each other, the origin of its lubricating behaviour.' },
+        { num: '03', label: 'CONDUCTIVITY', body: '\u03c0-electron delocalization within sheets \u2014 good in-plane conductor, poor out-of-plane.' },
+        { num: '04', label: 'USES',         body: 'Pencil leads, lithium-ion battery anodes, graphene source, industrial refractories.' }
+      ]
+    },
+
+    'stegosaurus': {
+      id: 'stegosaurus',
+      crumbs: ['Decks', 'Paleontology'],
+      subject: 'PALEONTOLOGY \u00b7 DINOSAUR \u00b7 JURASSIC',
+      name: 'Stegosaurus',
+      formula: 'Late Jurassic \u00b7 155\u2013150 Mya',
+      mass: '\u2248 5,000 kg',
+      grad: 'var(--grad-green)',
+      scanned: 'SCANNED 10 DAYS AGO',
+      reviewWhen: 'Tuesday',
+      reviewAt: '5:15 PM',
+      reviewProgress: { done: 0, total: 3 },
+      clipPrompts: [
+        'a photo of a Stegosaurus skeleton in a museum',
+        'a life reconstruction of a Stegosaurus with back plates',
+        'a dinosaur with a spiked tail and kite-shaped back plates',
+      ],
+      oneline: 'A Late Jurassic herbivore recognizable by paired rows of kite-shaped dermal plates along its back and a four-spiked tail (\u201cthagomizer\u201d) used for defense against theropods.',
+      facts: [
+        { num: '01', label: 'RANGE',       body: 'Morrison Formation of the western United States; coexisted with Allosaurus and Diplodocus.' },
+        { num: '02', label: 'PLATES',      body: 'Likely functioned in thermoregulation and species recognition, not primarily as armor.' },
+        { num: '03', label: 'BRAIN',       body: 'Braincase volume \u2248 80 cm\u00b3 \u2014 one of the lowest encephalization quotients among dinosaurs.' },
+        { num: '04', label: 'DIET',        body: 'Low-browsing herbivore; ornithischian tooth batteries processed ferns, cycads, and horsetails.' }
+      ]
+    },
+
+    'pyramid-giza': {
+      id: 'pyramid-giza',
+      crumbs: ['Decks', 'Survey of styles'],
+      subject: 'ARCHITECTURE \u00b7 ANCIENT EGYPTIAN \u00b7 2560 BC',
+      name: 'Great Pyramid of Giza',
+      formula: 'h = 138.5 m (originally 146.6 m)',
+      mass: '\u2248 5.9 Mt stone',
+      grad: 'var(--grad-amber)',
+      scanned: 'SCANNED 11 DAYS AGO',
+      reviewWhen: 'Wednesday',
+      reviewAt: '9:30 AM',
+      reviewProgress: { done: 2, total: 5 },
+      clipPrompts: [
+        'a photo of the Great Pyramid of Giza in Egypt',
+        'the stepped limestone pyramid of Khufu',
+        'the pyramids of Giza at sunrise',
+      ],
+      oneline: 'Tomb of the Fourth-Dynasty pharaoh Khufu \u2014 the only one of the Seven Wonders of the Ancient World still standing; held the title of tallest human-made structure for nearly 3,800 years.',
+      facts: [
+        { num: '01', label: 'BUILDERS',        body: 'Constructed c. 2580\u20132560 BC under Khufu; workforce estimated at 20,000 seasonal laborers.' },
+        { num: '02', label: 'BASE',            body: 'Square base 230.4 m per side; aligned to the cardinal points within 0.05\u00b0.' },
+        { num: '03', label: 'MATERIAL',        body: 'Local limestone core faced with Tura limestone; granite chambers from Aswan (800 km south).' },
+        { num: '04', label: 'INTERIOR',        body: 'King\u2019s Chamber, Queen\u2019s Chamber, and the Grand Gallery \u2014 rare among pyramids in having above-ground burial spaces.' }
+      ]
+    },
+
+    'ohms-law': {
+      id: 'ohms-law',
+      crumbs: ['Decks', 'Mechanics'],
+      subject: 'PHYSICS \u00b7 ELECTRICITY \u00b7 LINEAR RELATION',
+      name: 'Ohm\u2019s law',
+      formula: 'V = I R',
+      mass: 'Georg Ohm, 1827',
+      grad: 'var(--grad-physics)',
+      scanned: 'SCANNED 12 DAYS AGO',
+      reviewWhen: 'Thursday',
+      reviewAt: '1:45 PM',
+      reviewProgress: { done: 4, total: 6 },
+      clipPrompts: [
+        'a circuit diagram illustrating Ohm\u2019s law V equals I R',
+        'a physics textbook page with a resistor, battery, and ammeter',
+      ],
+      oneline: 'An empirical linearity in the current\u2013voltage response of resistive materials \u2014 V = I R \u2014 holds when resistance is independent of voltage and current.',
+      facts: [
+        { num: '01', label: 'STATEMENT',        body: 'Current through a resistor is proportional to the voltage across it, at constant temperature.' },
+        { num: '02', label: 'MICROSCOPIC VIEW', body: 'J = \u03c3 E \u2014 current density is proportional to electric field; conductivity \u03c3 is material-specific.' },
+        { num: '03', label: 'NONLINEAR ELEMENTS', body: 'Diodes, transistors, and plasmas violate Ohm\u2019s law \u2014 they have voltage-dependent resistance.' },
+        { num: '04', label: 'POWER',            body: 'P = V I = I\u00b2 R = V\u00b2 / R \u2014 Joule heating in a resistor.' }
+      ]
+    },
+
+    'sistine-ceiling': {
+      id: 'sistine-ceiling',
+      crumbs: ['Decks', 'Renaissance'],
+      subject: 'ART HISTORY \u00b7 HIGH RENAISSANCE \u00b7 1512',
+      name: 'Sistine Chapel ceiling',
+      formula: 'Michelangelo Buonarroti',
+      mass: 'Fresco  \u00b7  500 m\u00b2',
+      grad: 'var(--grad-art)',
+      scanned: 'SCANNED 13 DAYS AGO',
+      reviewWhen: 'Friday',
+      reviewAt: '2:15 PM',
+      reviewProgress: { done: 1, total: 5 },
+      clipPrompts: [
+        'a photo of the Sistine Chapel ceiling fresco',
+        'Michelangelo\u2019s Creation of Adam painting',
+        'a Renaissance fresco of the ceiling of a chapel in the Vatican',
+      ],
+      oneline: 'Michelangelo\u2019s fresco program for the Vatican\u2019s Cappella Sistina \u2014 nine Genesis scenes flanked by sibyls, prophets, and ignudi, painted 1508\u20131512 under Pope Julius II.',
+      facts: [
+        { num: '01', label: 'COMMISSION',  body: 'Pope Julius II; Michelangelo accepted reluctantly and originally proposed to decorate only the Twelve Apostles.' },
+        { num: '02', label: 'TECHNIQUE',   body: 'Buon fresco \u2014 pigment in wet lime plaster; once dry the paint becomes part of the wall.' },
+        { num: '03', label: 'ICONOGRAPHY', body: 'Central panels narrate Genesis from creation to the drunkenness of Noah; The Creation of Adam is the sixth panel.' },
+        { num: '04', label: 'RESTORATION', body: 'Cleaned 1980\u20131994 \u2014 revealed bright palette previously obscured by centuries of candle soot and varnish.' }
+      ]
+    },
+
+    'sun': {
+      id: 'sun',
+      crumbs: ['Decks', 'Solar system'],
+      subject: 'ASTRONOMY \u00b7 STAR \u00b7 G-TYPE MAIN SEQUENCE',
+      name: 'The Sun',
+      formula: 'M = 1.989 \u00d7 10\u00b3\u2070 kg',
+      mass: 'Age \u2248 4.6 Gyr',
+      grad: 'var(--grad-rust)',
+      scanned: 'SCANNED 2 WEEKS AGO',
+      reviewWhen: 'Saturday',
+      reviewAt: '7:00 PM',
+      reviewProgress: { done: 2, total: 5 },
+      clipPrompts: [
+        'a photo of the Sun with visible sunspots',
+        'a close-up image of the sun\u2019s corona during a solar eclipse',
+        'a telescope image of the solar surface',
+      ],
+      oneline: 'The central star of the solar system \u2014 a G2V main-sequence star that fuses hydrogen to helium via the proton-proton chain, radiating 3.8 \u00d7 10\u00b2\u2076 W from its 5,772 K photosphere.',
+      facts: [
+        { num: '01', label: 'COMPOSITION',   body: '~ 74% hydrogen, ~ 24% helium by mass; trace carbon, nitrogen, oxygen, and metals.' },
+        { num: '02', label: 'NUCLEAR FUEL',  body: 'p-p chain dominates below 15 M\u2609; CNO cycle in hotter cores.' },
+        { num: '03', label: 'STRUCTURE',     body: 'Core \u2192 radiative zone \u2192 convective zone \u2192 photosphere \u2192 chromosphere \u2192 corona.' },
+        { num: '04', label: 'FUTURE',        body: 'Main-sequence lifetime \u2248 10 Gyr \u2014 red-giant expansion in ~ 5 Gyr, white dwarf remnant by 7\u20138 Gyr.' }
+      ]
+    },
+
+    'photosystem-leaf': {
+      id: 'photosystem-leaf',
+      crumbs: ['Decks', 'Botany lab'],
+      subject: 'BOTANY \u00b7 ANATOMY \u00b7 DICOT LEAF',
+      name: 'Leaf cross-section',
+      formula: 'Dicot \u00b7 bifacial',
+      mass: 'Palisade + spongy mesophyll',
+      grad: 'var(--grad-green)',
+      scanned: 'SCANNED 15 DAYS AGO',
+      reviewWhen: 'Sunday',
+      reviewAt: '11:00 AM',
+      reviewProgress: { done: 0, total: 4 },
+      clipPrompts: [
+        'a microscopy cross-section of a dicot leaf',
+        'a botany textbook diagram showing palisade and spongy mesophyll layers',
+        'a labeled illustration of a leaf with xylem, phloem, and stomata',
+      ],
+      oneline: 'A bifacial dicotyledon leaf in cross-section \u2014 upper cuticle, epidermis, light-harvesting palisade mesophyll, gas-exchange spongy mesophyll, and lower epidermis studded with stomata.',
+      facts: [
+        { num: '01', label: 'PALISADE',      body: 'Columnar cells packed with chloroplasts; primary site of photosynthesis.' },
+        { num: '02', label: 'SPONGY',        body: 'Loosely arranged cells with large intercellular spaces \u2014 facilitates CO\u2082 diffusion to palisade.' },
+        { num: '03', label: 'STOMATA',       body: 'Guard-cell pores regulate gas exchange and transpiration; density varies with light and CO\u2082.' },
+        { num: '04', label: 'VASCULATURE',   body: 'Xylem (up) and phloem (down) bundled in the midvein; transports water, minerals, and sugars.' }
+      ]
     }
   },
 
@@ -467,7 +784,75 @@ window.LENS_DATA = {
 
     // --- Musical instruments (useful for art/music cross-subject demos) ---
     { id: 'piano',         displayName: 'Piano',          subject: 'MUSIC \u00b7 INSTRUMENT',         grad: 'var(--grad-astro)',   prompts: ['a photo of a piano keyboard', 'a grand piano in a concert hall'] },
-    { id: 'violin',        displayName: 'Violin',         subject: 'MUSIC \u00b7 STRING',             grad: 'var(--grad-rust)',    prompts: ['a photo of a violin with bow', 'a wooden violin on a stand'] },
+    { id: 'violin',        displayName: 'Violin',         subject: 'MUSIC \u00b7 STRING',             prompts: ['a photo of a violin with bow', 'a wooden violin on a stand'], grad: 'var(--grad-rust)' },
     { id: 'guitar',        displayName: 'Guitar',         subject: 'MUSIC \u00b7 STRING',             grad: 'var(--grad-amber)',   prompts: ['a photo of an acoustic guitar', 'a classical guitar lying on the ground'] },
+
+    // --- Update 5 expansion: broader coverage for comparative benchmarking ---
+
+    // Chemistry reactions / forms
+    { id: 'flame-test',        displayName: 'Flame test',        subject: 'CHEMISTRY \u00b7 QUALITATIVE ANALYSIS', grad: 'var(--grad-rust)',    prompts: ['a photo of a flame test showing colored flames', 'copper chloride burning green in a bunsen burner'] },
+    { id: 'titration',         displayName: 'Titration setup',   subject: 'CHEMISTRY \u00b7 ANALYTICAL', grad: 'var(--grad-blue)',    prompts: ['a photo of a titration apparatus with burette and flask', 'a chemistry lab titration with a purple solution'] },
+    { id: 'distillation',      displayName: 'Distillation apparatus', subject: 'CHEMISTRY \u00b7 SEPARATION', grad: 'var(--grad-physics)', prompts: ['a photo of a laboratory distillation setup with condenser', 'a chemistry class distillation with round-bottom flask'] },
+    { id: 'ph-paper',          displayName: 'pH indicator paper', subject: 'CHEMISTRY \u00b7 INDICATOR', grad: 'var(--grad-green)',   prompts: ['a photo of pH litmus paper strips', 'a chemistry pH indicator test strip with colors'] },
+    { id: 'ice-cube',          displayName: 'Ice',               subject: 'CHEMISTRY \u00b7 PHASE', grad: 'var(--grad-blue)',    prompts: ['a photo of an ice cube', 'crystal clear ice on a dark surface'] },
+
+    // Biology, anatomy, microbiology
+    { id: 'heart',             displayName: 'Human heart',       subject: 'ANATOMY \u00b7 CIRCULATORY', grad: 'var(--grad-rust)',    prompts: ['an anatomical model of the human heart', 'a textbook diagram of the heart with four chambers'] },
+    { id: 'lungs',             displayName: 'Lungs',             subject: 'ANATOMY \u00b7 RESPIRATORY', grad: 'var(--grad-orange)',  prompts: ['an anatomical diagram of the human lungs', 'a model of lungs with trachea and bronchi'] },
+    { id: 'eye-anatomy',       displayName: 'Human eye',         subject: 'ANATOMY \u00b7 SENSORY', grad: 'var(--grad-violet)',  prompts: ['a cross-section diagram of the human eye', 'a labeled anatomical illustration of the eye'] },
+    { id: 'bacteria',          displayName: 'Bacteria',          subject: 'MICROBIOLOGY \u00b7 PROKARYOTE', grad: 'var(--grad-green)',   prompts: ['a microscope image of bacteria colonies', 'a diagram of a bacterial cell with flagella'] },
+    { id: 'virus',             displayName: 'Virus',             subject: 'MICROBIOLOGY \u00b7 ACELLULAR', grad: 'var(--grad-violet)',  prompts: ['an electron micrograph of a virus', 'a diagram of a virus with capsid and RNA'] },
+    { id: 'frog',              displayName: 'Frog',              subject: 'ZOOLOGY \u00b7 AMPHIBIAN', grad: 'var(--grad-green)',   prompts: ['a photo of a green frog on a lily pad', 'a close-up photo of a tree frog'] },
+    { id: 'turtle',            displayName: 'Turtle',            subject: 'ZOOLOGY \u00b7 REPTILE', grad: 'var(--grad-green)',   prompts: ['a photo of a sea turtle swimming', 'a tortoise on a log'] },
+    { id: 'owl',               displayName: 'Owl',               subject: 'ZOOLOGY \u00b7 BIRD', grad: 'var(--grad-arch)',    prompts: ['a photo of a barn owl perched on a branch', 'a close-up photo of a snowy owl'] },
+    { id: 'shark',             displayName: 'Shark',             subject: 'ZOOLOGY \u00b7 CARTILAGINOUS FISH', grad: 'var(--grad-blue)',    prompts: ['a photo of a great white shark underwater', 'an underwater photo of a shark with open mouth'] },
+    { id: 'jellyfish',         displayName: 'Jellyfish',         subject: 'ZOOLOGY \u00b7 CNIDARIAN', grad: 'var(--grad-violet)',  prompts: ['a photo of a jellyfish drifting in the ocean', 'a glowing moon jellyfish in an aquarium'] },
+    { id: 'honeycomb',         displayName: 'Honeycomb',         subject: 'BIOLOGY \u00b7 ANIMAL STRUCTURE', grad: 'var(--grad-amber)',   prompts: ['a photo of a honeycomb with hexagonal cells', 'a bee hive with comb and honey'] },
+
+    // Botany
+    { id: 'tulip',             displayName: 'Tulip',             subject: 'BOTANY \u00b7 LILIACEAE', grad: 'var(--grad-rust)',    prompts: ['a photo of a red tulip flower', 'a field of tulips in spring'] },
+    { id: 'orchid',            displayName: 'Orchid',            subject: 'BOTANY \u00b7 ORCHIDACEAE', grad: 'var(--grad-violet)',  prompts: ['a photo of a purple orchid flower', 'a close-up photo of an orchid bloom'] },
+    { id: 'pine-tree',         displayName: 'Pine tree',         subject: 'BOTANY \u00b7 CONIFER', grad: 'var(--grad-green)',   prompts: ['a photo of a pine tree with needles and cones', 'a forest of pine trees in winter'] },
+    { id: 'moss',              displayName: 'Moss',              subject: 'BOTANY \u00b7 BRYOPHYTE', grad: 'var(--grad-green)',   prompts: ['a close-up photo of green moss on a rock', 'a patch of moss on tree bark'] },
+    { id: 'venus-flytrap',     displayName: 'Venus flytrap',     subject: 'BOTANY \u00b7 CARNIVOROUS PLANT', grad: 'var(--grad-green)',   prompts: ['a photo of a venus flytrap plant', 'a close-up of a venus flytrap\u2019s trap leaves'] },
+
+    // Geology / environment
+    { id: 'fossil-ammonite',   displayName: 'Ammonite fossil',   subject: 'PALEONTOLOGY \u00b7 CEPHALOPOD', grad: 'var(--grad-arch)',    prompts: ['a photo of a spiral ammonite fossil', 'a cross-section of a fossilized ammonite'] },
+    { id: 'dinosaur-skull',    displayName: 'Dinosaur skull',    subject: 'PALEONTOLOGY \u00b7 SPECIMEN', grad: 'var(--grad-arch)',    prompts: ['a photo of a tyrannosaurus rex skull in a museum', 'a dinosaur fossil skull with teeth'] },
+    { id: 'volcano',           displayName: 'Volcano',           subject: 'GEOLOGY \u00b7 VOLCANIC', grad: 'var(--grad-rust)',    prompts: ['a photo of a volcanic eruption with lava', 'an aerial photo of a volcanic crater'] },
+    { id: 'river',             displayName: 'River',             subject: 'GEOGRAPHY \u00b7 HYDROLOGY', grad: 'var(--grad-blue)',    prompts: ['an aerial photo of a winding river through a valley', 'a photo of a flowing river with rocky banks'] },
+
+    // Physics / engineering
+    { id: 'spring',            displayName: 'Spring (Hooke)',    subject: 'PHYSICS \u00b7 MECHANICS', grad: 'var(--grad-physics)', prompts: ['a photo of a metal coil spring', 'a physics experiment with a spring and hanging mass'] },
+    { id: 'newtons-cradle',    displayName: 'Newton\u2019s cradle', subject: 'PHYSICS \u00b7 MOMENTUM', grad: 'var(--grad-physics)', prompts: ['a photo of a Newton\u2019s cradle desk toy', 'a Newton\u2019s cradle with five metal spheres swinging'] },
+    { id: 'lens-optical',      displayName: 'Optical lens',      subject: 'PHYSICS \u00b7 OPTICS', grad: 'var(--grad-violet)',  prompts: ['a photo of a glass convex lens', 'a physics optics bench with a biconvex lens'] },
+    { id: 'tesla-coil',        displayName: 'Tesla coil',        subject: 'PHYSICS \u00b7 ELECTROMAGNETISM', grad: 'var(--grad-astro)',   prompts: ['a photo of a tesla coil with electric arcs', 'a tesla coil demonstration with purple lightning'] },
+    { id: 'gear-mechanism',    displayName: 'Gear mechanism',    subject: 'ENGINEERING \u00b7 MECHANICAL', grad: 'var(--grad-physics)', prompts: ['a photo of interlocking mechanical gears', 'a cross-section of a gear train'] },
+
+    // Astronomy
+    { id: 'galaxy',            displayName: 'Spiral galaxy',     subject: 'ASTRONOMY \u00b7 GALAXY', grad: 'var(--grad-astro)',   prompts: ['a telescope image of a spiral galaxy', 'an image of the Andromeda galaxy'] },
+    { id: 'nebula',            displayName: 'Nebula',            subject: 'ASTRONOMY \u00b7 NEBULA', grad: 'var(--grad-violet)',  prompts: ['a telescope image of a colorful nebula', 'an image of the Orion Nebula'] },
+    { id: 'telescope',         displayName: 'Telescope',         subject: 'INSTRUMENT \u00b7 OPTICAL', grad: 'var(--grad-physics)', prompts: ['a photo of an astronomical reflecting telescope', 'an amateur telescope pointed at the night sky'] },
+
+    // Architecture / landmarks
+    { id: 'notre-dame',        displayName: 'Notre-Dame de Paris', subject: 'ARCHITECTURE \u00b7 GOTHIC', grad: 'var(--grad-arch)',    prompts: ['a photo of Notre-Dame Cathedral in Paris', 'the gothic facade of Notre-Dame with twin towers'] },
+    { id: 'empire-state',      displayName: 'Empire State Building', subject: 'ARCHITECTURE \u00b7 ART DECO', grad: 'var(--grad-arch)',    prompts: ['a photo of the Empire State Building in New York', 'the Empire State Building skyline at night'] },
+    { id: 'lincoln-memorial',  displayName: 'Lincoln Memorial',  subject: 'ARCHITECTURE \u00b7 NEOCLASSICAL', grad: 'var(--grad-arch)',    prompts: ['a photo of the Lincoln Memorial in Washington', 'the marble statue of Abraham Lincoln in the Lincoln Memorial'] },
+    { id: 'great-wall',        displayName: 'Great Wall of China', subject: 'ARCHITECTURE \u00b7 MING DYNASTY', grad: 'var(--grad-arch)',    prompts: ['a photo of the Great Wall of China winding over mountains', 'a watchtower on the Great Wall of China'] },
+
+    // Art history
+    { id: 'last-supper',       displayName: 'The Last Supper',   subject: 'ART HISTORY \u00b7 RENAISSANCE', grad: 'var(--grad-art)',     prompts: ['a photo of Leonardo da Vinci\u2019s The Last Supper mural', 'a fresco of Jesus and the apostles at a long table'] },
+    { id: 'the-thinker',       displayName: 'The Thinker',       subject: 'ART HISTORY \u00b7 MODERN SCULPTURE', grad: 'var(--grad-arch)',    prompts: ['a photo of Rodin\u2019s The Thinker sculpture', 'a bronze sculpture of a man sitting with chin on hand'] },
+    { id: 'girl-with-pearl',   displayName: 'Girl with a Pearl Earring', subject: 'ART HISTORY \u00b7 DUTCH GOLDEN AGE', grad: 'var(--grad-art)',     prompts: ['a photo of Vermeer\u2019s Girl with a Pearl Earring', 'a painting of a girl wearing a turban and a pearl earring'] },
+
+    // Music instruments
+    { id: 'drum-kit',          displayName: 'Drum kit',          subject: 'MUSIC \u00b7 PERCUSSION', grad: 'var(--grad-astro)',   prompts: ['a photo of a drum set with snare, kick, and cymbals', 'a rock music drum kit on a stage'] },
+    { id: 'flute',             displayName: 'Flute',             subject: 'MUSIC \u00b7 WOODWIND', grad: 'var(--grad-arch)',    prompts: ['a photo of a silver concert flute', 'a musician holding a flute'] },
+    { id: 'trumpet',           displayName: 'Trumpet',           subject: 'MUSIC \u00b7 BRASS', grad: 'var(--grad-amber)',   prompts: ['a photo of a brass trumpet', 'a jazz trumpet on a red background'] },
+
+    // Math / STEM symbolic
+    { id: 'abacus',            displayName: 'Abacus',            subject: 'MATHEMATICS \u00b7 HISTORICAL TOOL', grad: 'var(--grad-arch)',    prompts: ['a photo of a wooden abacus with beads', 'a traditional Chinese abacus'] },
+    { id: 'compass-geometry',  displayName: 'Compass (drawing)', subject: 'MATHEMATICS \u00b7 GEOMETRY', grad: 'var(--grad-physics)', prompts: ['a photo of a geometry drawing compass', 'a metal drawing compass next to graph paper'] },
+    { id: 'protractor',        displayName: 'Protractor',        subject: 'MATHEMATICS \u00b7 GEOMETRY', grad: 'var(--grad-blue)',    prompts: ['a photo of a semicircular protractor', 'a transparent protractor on a desk'] },
   ],
 };

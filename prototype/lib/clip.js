@@ -46,12 +46,16 @@ function hasWebGPU() {
 }
 
 async function tryLoad(device) {
-  const opts = { device };
+  // Force fp32 AND the dedicated text/vision ONNX subgraphs. Transformers.js
+  // 3.0.2 otherwise falls back to the combined `model.onnx` for this checkpoint
+  // when using WebGPU, which expects BOTH text + image inputs at once and
+  // breaks vision-only calls with "Missing the following inputs: input_ids".
+  const base = device === 'webgpu' ? { device, dtype: 'fp32' } : { device };
   const [tokenizer, processor, textModel, visionModel] = await Promise.all([
     AutoTokenizer.from_pretrained(MODEL_ID),
     AutoProcessor.from_pretrained(MODEL_ID),
-    CLIPTextModelWithProjection.from_pretrained(MODEL_ID, opts),
-    CLIPVisionModelWithProjection.from_pretrained(MODEL_ID, opts),
+    CLIPTextModelWithProjection.from_pretrained(MODEL_ID,   { ...base, model_file_name: 'text_model' }),
+    CLIPVisionModelWithProjection.from_pretrained(MODEL_ID, { ...base, model_file_name: 'vision_model' }),
   ]);
   return { tokenizer, processor, textModel, visionModel };
 }
