@@ -1,0 +1,44 @@
+# YOLOv8 / Ultralytics dataset manifest for the Lens school-objects dataset.
+#
+# Layout expected by Ultralytics:
+#   dataset/
+#     data.yaml                  <- this file
+#     images/raw/<class>/*.jpg   <- output of collect_dataset.py (pre-annotation)
+#     images/train/*.jpg         <- after Roboflow export
+#     images/val/*.jpg
+#     images/test/*.jpg
+#     labels/train/*.txt
+#     labels/val/*.txt
+#     labels/test/*.txt
+#
+# After exporting from Roboflow as "YOLOv8" format, overwrite this file with
+# the one Roboflow produces, or keep both and reconcile by hand.
+
+path: .                # dataset root (relative to this file)
+train: images/train
+val: images/val
+test: images/test
+
+# Classes — index matches the integer class_id in the YOLO label txt files
+# (format: class_id cx cy w h, normalized 0..1).
+names:
+  # Original six classes used in the Update 4 benchmark
+  0: textbook
+  1: whiteboard
+  2: desk_chair
+  3: chemistry_flask
+  4: laptop_computer
+  5: ruler_pencil_pen
+  # Classes added in Update 5 for broader evaluation coverage
+  6: microscope
+  7: calculator
+  8: backpack
+  9: periodic_table_poster
+  10: globe_model
+  11: safety_goggles
+
+# Optional metadata — for documentation, not read by Ultralytics
+source: bing-image-crawler via YOLOv8-Detection/collect_dataset.py
+deduped_by: md5 of raw bytes
+annotation_tool: Roboflow (axis-aligned bounding boxes)
+license: research use only; raw images are not redistributed
