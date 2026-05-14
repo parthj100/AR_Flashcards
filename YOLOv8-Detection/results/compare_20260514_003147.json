@@ -1,0 +1,245 @@
+{
+  "meta": {
+    "device": "mps",
+    "imgsz": 640,
+    "conf": 0.25,
+    "warmup": 5,
+    "classes": [
+      "microscope",
+      "calculator",
+      "backpack",
+      "periodic_table_poster",
+      "globe_model",
+      "safety_goggles"
+    ],
+    "total_images": 554,
+    "timestamp": "20260514_003147"
+  },
+  "results": [
+    {
+      "model": "yolov8n.pt",
+      "per_class": [
+        {
+          "class": "backpack",
+          "images": 97,
+          "avg_ms": 83.3,
+          "p50_ms": 52.0,
+          "p95_ms": 312.73,
+          "fps": 12.01,
+          "avg_dets": 3.94,
+          "avg_conf": 0.5111
+        },
+        {
+          "class": "calculator",
+          "images": 88,
+          "avg_ms": 45.65,
+          "p50_ms": 32.48,
+          "p95_ms": 61.16,
+          "fps": 21.9,
+          "avg_dets": 2.3,
+          "avg_conf": 0.5208
+        },
+        {
+          "class": "globe_model",
+          "images": 96,
+          "avg_ms": 43.49,
+          "p50_ms": 37.39,
+          "p95_ms": 80.29,
+          "fps": 23.0,
+          "avg_dets": 3.95,
+          "avg_conf": 0.4952
+        },
+        {
+          "class": "microscope",
+          "images": 99,
+          "avg_ms": 39.53,
+          "p50_ms": 34.11,
+          "p95_ms": 67.43,
+          "fps": 25.3,
+          "avg_dets": 3.18,
+          "avg_conf": 0.514
+        },
+        {
+          "class": "periodic_table_poster",
+          "images": 78,
+          "avg_ms": 37.95,
+          "p50_ms": 34.1,
+          "p95_ms": 52.58,
+          "fps": 26.35,
+          "avg_dets": 1.4,
+          "avg_conf": 0.4644
+        },
+        {
+          "class": "safety_goggles",
+          "images": 96,
+          "avg_ms": 36.34,
+          "p50_ms": 30.68,
+          "p95_ms": 62.13,
+          "fps": 27.52,
+          "avg_dets": 2.72,
+          "avg_conf": 0.5658
+        }
+      ],
+      "overall": {
+        "images": 554,
+        "wall_s": 26.86,
+        "avg_ms": 48.08,
+        "p50_ms": 34.79,
+        "p95_ms": 87.72,
+        "p99_ms": 348.29,
+        "fps": 20.8,
+        "avg_conf": 0.5147
+      }
+    },
+    {
+      "model": "yolov8s.pt",
+      "per_class": [
+        {
+          "class": "backpack",
+          "images": 97,
+          "avg_ms": 95.79,
+          "p50_ms": 48.68,
+          "p95_ms": 394.78,
+          "fps": 10.44,
+          "avg_dets": 5.63,
+          "avg_conf": 0.5364
+        },
+        {
+          "class": "calculator",
+          "images": 88,
+          "avg_ms": 60.46,
+          "p50_ms": 46.55,
+          "p95_ms": 80.3,
+          "fps": 16.54,
+          "avg_dets": 2.49,
+          "avg_conf": 0.5938
+        },
+        {
+          "class": "globe_model",
+          "images": 96,
+          "avg_ms": 63.21,
+          "p50_ms": 53.96,
+          "p95_ms": 115.45,
+          "fps": 15.82,
+          "avg_dets": 4.42,
+          "avg_conf": 0.513
+        },
+        {
+          "class": "microscope",
+          "images": 99,
+          "avg_ms": 56.68,
+          "p50_ms": 49.77,
+          "p95_ms": 76.22,
+          "fps": 17.64,
+          "avg_dets": 3.75,
+          "avg_conf": 0.5695
+        },
+        {
+          "class": "periodic_table_poster",
+          "images": 78,
+          "avg_ms": 58.75,
+          "p50_ms": 54.08,
+          "p95_ms": 96.67,
+          "fps": 17.02,
+          "avg_dets": 1.54,
+          "avg_conf": 0.5247
+        },
+        {
+          "class": "safety_goggles",
+          "images": 96,
+          "avg_ms": 54.38,
+          "p50_ms": 50.01,
+          "p95_ms": 94.97,
+          "fps": 18.39,
+          "avg_dets": 3.45,
+          "avg_conf": 0.5984
+        }
+      ],
+      "overall": {
+        "images": 554,
+        "wall_s": 36.32,
+        "avg_ms": 65.15,
+        "p50_ms": 50.79,
+        "p95_ms": 116.3,
+        "p99_ms": 396.41,
+        "fps": 15.35,
+        "avg_conf": 0.5534
+      }
+    },
+    {
+      "model": "yolov8m.pt",
+      "per_class": [
+        {
+          "class": "backpack",
+          "images": 97,
+          "avg_ms": 119.33,
+          "p50_ms": 67.86,
+          "p95_ms": 442.6,
+          "fps": 8.38,
+          "avg_dets": 6.19,
+          "avg_conf": 0.5616
+        },
+        {
+          "class": "calculator",
+          "images": 88,
+          "avg_ms": 79.34,
+          "p50_ms": 59.54,
+          "p95_ms": 95.82,
+          "fps": 12.6,
+          "avg_dets": 2.69,
+          "avg_conf": 0.6208
+        },
+        {
+          "class": "globe_model",
+          "images": 96,
+          "avg_ms": 71.09,
+          "p50_ms": 65.85,
+          "p95_ms": 109.16,
+          "fps": 14.07,
+          "avg_dets": 5.16,
+          "avg_conf": 0.541
+        },
+        {
+          "class": "microscope",
+          "images": 99,
+          "avg_ms": 67.54,
+          "p50_ms": 59.92,
+          "p95_ms": 82.2,
+          "fps": 14.81,
+          "avg_dets": 4.12,
+          "avg_conf": 0.5636
+        },
+        {
+          "class": "periodic_table_poster",
+          "images": 78,
+          "avg_ms": 75.05,
+          "p50_ms": 65.72,
+          "p95_ms": 154.36,
+          "fps": 13.32,
+          "avg_dets": 1.81,
+          "avg_conf": 0.5554
+        },
+        {
+          "class": "safety_goggles",
+          "images": 96,
+          "avg_ms": 66.01,
+          "p50_ms": 58.78,
+          "p95_ms": 112.96,
+          "fps": 15.15,
+          "avg_dets": 3.94,
+          "avg_conf": 0.5862
+        }
+      ],
+      "overall": {
+        "images": 554,
+        "wall_s": 44.47,
+        "avg_ms": 79.89,
+        "p50_ms": 62.17,
+        "p95_ms": 141.95,
+        "p99_ms": 474.97,
+        "fps": 12.52,
+        "avg_conf": 0.5674
+      }
+    }
+  ]
+}
