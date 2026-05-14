@@ -876,3 +876,73 @@ kbd {
 /* Helpers */
 .muted { color: var(--muted); }
 .hidden { display: none !important; }
+
+
+/* === Live camera + ML status (scan view overrides) === */
+.scan-video {
+  position: absolute; inset: 24px;
+  width: calc(100% - 48px); height: calc(100% - 48px);
+  object-fit: cover;
+  border-radius: 18px;
+  z-index: 0;
+  background: #000;
+}
+.scan-vignette {
+  position: absolute; inset: 24px;
+  border-radius: 18px;
+  pointer-events: none;
+  z-index: 1;
+  background:
+    radial-gradient(ellipse 70% 55% at 50% 45%, transparent 0%, rgba(0,0,0,.25) 60%, rgba(0,0,0,.55) 100%);
+}
+
+/* The right-hand tool pills can show ML status — dot color shifts */
+.tool-pill #ml-text,
+.tool-pill #llm-text {
+  font-family: var(--font-sans);
+  font-weight: 500;
+}
+
+/* Detection pill now re-positions itself above the video (less crowded) */
+.scan-detection-pill {
+  top: 22%;
+}
+
+/* Generation overlay shown while Ollama is writing a card */
+.gen-overlay {
+  position: fixed; inset: 0; z-index: 60;
+  background: rgba(11,11,10,.55);
+  display: flex; align-items: center; justify-content: center;
+  backdrop-filter: blur(4px);
+}
+.gen-overlay[hidden] { display: none; }
+.gen-card {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 32px 36px;
+  width: 420px;
+  box-shadow: 0 30px 80px -20px rgba(0,0,0,.35);
+  text-align: left;
+}
+.gen-spinner {
+  width: 22px; height: 22px;
+  border-radius: 50%;
+  border: 2.5px solid var(--chip-2);
+  border-top-color: var(--ink);
+  animation: gen-spin .9s linear infinite;
+  margin-bottom: 16px;
+}
+@keyframes gen-spin { to { transform: rotate(360deg); } }
+.gen-head {
+  font-size: 11px; letter-spacing: .18em; text-transform: uppercase;
+  color: var(--muted); font-weight: 500; margin-bottom: 6px;
+}
+.gen-topic {
+  font-family: var(--font-display);
+  font-size: 38px; line-height: 1; letter-spacing: -0.01em;
+}
+.gen-sub {
+  margin-top: 12px;
+  font-size: 13.5px; color: var(--ink-2); line-height: 1.45;
+}
