@@ -9,6 +9,7 @@ const RT = window.LENS_RUNTIME = window.LENS_RUNTIME || {
   mlError: null,        // string error if ML failed to init
   ollamaOk: false,      // true after a successful Ollama health check
   yoloOk: false,        // true after successful /health from the YOLO server
+  ocrOk: false,         // true after a successful EasyOCR health check
   scanMode: (function () {
     try { return localStorage.getItem('lens.scanMode') || 'single'; } catch { return 'single'; }
   })(),
@@ -20,7 +21,7 @@ const RT = window.LENS_RUNTIME = window.LENS_RUNTIME || {
 };
 
 function setScanMode(mode) {
-  RT.scanMode = mode === 'multi' ? 'multi' : 'single';
+  RT.scanMode = ['single', 'multi', 'ocr'].includes(mode) ? mode : 'single';
   try { localStorage.setItem('lens.scanMode', RT.scanMode); } catch {}
 }
 
@@ -484,10 +485,12 @@ function renderScan(root) {
           <div class="mode-toggle" role="tablist" aria-label="Scan mode">
             <button class="mode-opt ${RT.scanMode==='single'?'is-active':''}" data-mode="single" role="tab" aria-selected="${RT.scanMode==='single'}">Single</button>
             <button class="mode-opt ${RT.scanMode==='multi'?'is-active':''}" data-mode="multi" role="tab" aria-selected="${RT.scanMode==='multi'}">Multi · YOLO</button>
+            <button class="mode-opt ${RT.scanMode==='ocr'?'is-active':''}" data-mode="ocr" role="tab" aria-selected="${RT.scanMode==='ocr'}">Text · OCR</button>
           </div>
           <div class="right-tools">
             <span class="tool-pill" id="ml-status"><span class="live" id="ml-dot"></span><span id="ml-text">Starting…</span></span>
             <span class="tool-pill ${RT.scanMode==='multi'?'':'is-hidden'}" id="yolo-status"><span class="live" id="yolo-dot" style="background:#8B8B86;box-shadow:none"></span><span id="yolo-text">YOLO</span></span>
+            <span class="tool-pill ${RT.scanMode==='ocr'?'':'is-hidden'}" id="ocr-status"><span class="live" id="ocr-dot" style="background:#8B8B86;box-shadow:none"></span><span id="ocr-text">OCR</span></span>
             <span class="tool-pill" id="llm-status"><span class="live" id="llm-dot" style="background:#8B8B86;box-shadow:none"></span><span id="llm-text">LLM</span></span>
             <button class="tool-pill close" data-route="#dashboard">${ico('x')}</button>
           </div>
@@ -592,7 +595,7 @@ async function startScanController(root) {
     // If <script type="module"> hasn't loaded yet, wait for it
     await new Promise(resolve => window.addEventListener('lens-ml-ready', resolve, { once: true }));
   }
-  const { Clip, Llm, Yolo, Camera } = window.LensML;
+  const { Clip, Llm, Yolo, Ocr, Camera } = window.LensML;
 
   const videoEl  = $('#scan-video', root);
   const pill     = $('#detection-pill', root);
@@ -732,6 +735,7 @@ async function startScanController(root) {
       b.setAttribute('aria-selected', on);
     });
     yoloStatus.classList.toggle('is-hidden', RT.scanMode !== 'multi');
+    ocrStatus.classList.toggle('is-hidden', RT.scanMode !== 'ocr');
     if (RT.scanMode === 'multi') {
       pipeFoot.textContent = 'Multi mode · YOLO localizes objects at capture, CLIP re-identifies, Phi-3 writes.';
       scanHint.textContent = 'Point at a cluttered scene · capture runs YOLO and shows a picker';
@@ -745,6 +749,7 @@ async function startScanController(root) {
     setScanMode(b.dataset.mode);
     updateModeUi();
     if (RT.scanMode === 'multi') checkYolo();
+      if (RT.scanMode === 'ocr') checkOcrServer();
   }));
 
   // YOLO health check — only bother if the user opts into multi mode.
@@ -753,6 +758,30 @@ async function startScanController(root) {
     yoloDot.style.background = color;
     yoloDot.style.boxShadow = color === '#2ecc71' ? '0 0 0 3px rgba(46,204,113,.18)' : 'none';
   };
+  const ocrText   = $('#ocr-text', root);
+  const ocrDot    = $('#ocr-dot', root);
+  const ocrStatus = $('#ocr-status', root);
+  const setOcr = (text, color) => {
+    ocrText.textContent = text;
+    ocrDot.style.background = color;
+    ocrDot.style.boxShadow = color === '#2ecc71' ? '0 0 0 3px rgba(46,204,113,.18)' : 'none';
+  };
+  
+  let ocrHealthChecked = false;
+  const checkOcrServer = async () => {
+    if (ocrHealthChecked) return;
+    ocrHealthChecked = true;
+    setOcr('OCR · checking…', '#E5A23A');
+    const h = await Ocr.health();
+    if (h.ok) {
+      RT.ocrOk = true;
+      setOcr('OCR · ready', '#2ecc71');
+    } else {
+      RT.ocrOk = false;
+      setOcr('OCR offline', '#E97352');
+    }
+  };
+
   let yoloHealthChecked = false;
   const checkYolo = async () => {
     if (yoloHealthChecked) return;
@@ -822,13 +851,90 @@ async function startScanController(root) {
   };
 
   // 6. Capture handler — branches on mode.
+  const captureOcr = async () => {
+    if (!RT.ocrOk) {
+      scanHint.textContent = 'OCR server not reachable — start python OCR/ocr_serve.py';
+      return;
+    }
+    const full = cam.captureFrame(720);
+    if (!full) { scanHint.textContent = 'Camera frame unavailable'; return; }
+ 
+    scanHint.textContent = 'Reading text…';
+    let result;
+    try {
+      result = await Ocr.extractText(full, { conf: 0.5 });
+    } catch (err) {
+      scanHint.textContent = `OCR error: ${(err.message || err).slice(0, 120)}`;
+      return;
+    }
+ 
+    if (!result.rawText.trim()) {
+      scanHint.textContent = 'No text found — try holding the camera steadier or closer';
+      return;
+    }
+ 
+    panelName.textContent = 'Text detected';
+    panelSub.innerHTML = `<span>${result.lines.length} line${result.lines.length===1?'':'s'} · ${result.inferenceMs.toFixed(0)} ms</span>`;
+    scanHint.textContent = `Found: "${result.rawText.slice(0, 60)}${result.rawText.length > 60 ? '…' : ''}"`;
+ 
+    if (!RT.ollamaOk) {
+      scanHint.textContent = 'Ollama unreachable — start "ollama serve" then try again';
+      return;
+    }
+ 
+    const topic = result.rawText.slice(0, 200);
+    const id    = `ocr-${Date.now()}`;
+    const meta  = {
+      id,
+      displayName: topic.slice(0, 60),
+      subject: 'TEXT · OCR',
+      grad: 'var(--grad-physics)',
+      kind: 'ocr',
+    };
+ 
+    showGenOverlay(meta.displayName);
+    try {
+      const flashcard = await Llm.generateFlashcard({
+        topic,
+        hintPrompt: `This text was extracted from a printed card or document via OCR: "${topic}"`,
+      });
+      RT.generatedCards[id] = {
+        id,
+        crumbs: ['Scanned', 'Text · OCR'],
+        subject: flashcard.subject || 'TEXT · OCR',
+        name: flashcard.name,
+        formula: flashcard.formula,
+        mass: flashcard.mass,
+        grad: 'var(--grad-physics)',
+        scanned: 'JUST NOW · OCR SCAN',
+        reviewWhen: 'Tomorrow',
+        reviewAt: '9:00 AM',
+        reviewProgress: { done: 0, total: 4 },
+        oneline: flashcard.oneline,
+        facts: flashcard.facts,
+        generated: true,
+      };
+      recordCapture({ id, meta, isGenerated: true });
+      hideGenOverlay();
+      navigate(`#flashcard?id=${id}`);
+    } catch (err) {
+      hideGenOverlay();
+      scanHint.textContent = `Generation failed: ${(err.message || err).slice(0, 100)}`;
+    }
+  };
+ 
   const capture = async () => {
     const btn = $('#capture-btn', root);
     if (btn) { btn.style.transform = 'scale(.92)'; setTimeout(() => btn.style.transform = '', 120); }
-
+ 
+    if (RT.scanMode === 'ocr') {
+      return captureOcr();
+    }
+ 
     if (RT.scanMode === 'multi') {
       return captureMulti();
     }
+ 
     // ---- single mode (default) ----
     if (!lastTop) {
       scanHint.textContent = 'No confident match yet — hold steady';
@@ -836,7 +942,7 @@ async function startScanController(root) {
     }
     handleTopic(lastTop);
   };
-
+  
   // Multi-mode capture: YOLO server produces boxes + crops, CLIP re-IDs each crop,
   // then we render a picker. User click = existing authored/generated flow.
   const captureMulti = async () => {
