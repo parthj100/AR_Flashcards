@@ -43,10 +43,11 @@
     import * as Clip from './lib/clip.js';
     import * as Llm  from './lib/llm.js';
     import * as Yolo from './lib/yolo.js';
+    import * as Ocr  from './lib/ocr.js';
     import { Camera } from './lib/camera.js';
 
     // Expose to the global scope so app.js (non-module) can use them.
-    window.LensML = { Clip, Llm, Yolo, Camera };
+    window.LensML = { Clip, Llm, Yolo, Ocr , Camera };
     window.dispatchEvent(new CustomEvent('lens-ml-ready'));
   </script>
 </body>
