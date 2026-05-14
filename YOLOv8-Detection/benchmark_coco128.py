@@ -15,7 +15,7 @@ MODEL_PATH  = "yolov8n.pt"       # downloaded automatically if not present
 CONF_THRESH = 0.25               # minimum confidence to count a detection
 IMG_SIZE    = 640                # standard YOLO input size
 WARMUP_RUNS = 5                  # throwaway runs before timing starts
-OUTPUT_CSV  = "benchmark_results_coco128.csv"
+OUTPUT_CSV  = Path(__file__).resolve().parent / "results" / "benchmark_results_coco128.csv"
  
 # COCO128 lives here after first download
 COCO128_IMAGES = DATASETS_DIR / "coco128" / "images" / "train2017"
@@ -157,6 +157,7 @@ def run_benchmark():
  
     # ── Save CSV ──────────────────────────────────────────────────────────────
     csv_path = Path(OUTPUT_CSV)
+    csv_path.parent.mkdir(parents=True, exist_ok=True)
     with open(csv_path, "w", newline="") as f:
         writer = csv.DictWriter(f, fieldnames=["class", "detections", "avg_conf"])
         writer.writeheader()

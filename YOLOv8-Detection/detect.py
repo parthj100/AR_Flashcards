@@ -28,7 +28,7 @@ warnings.filterwarnings("ignore")
 # ── Config ────────────────────────────────────────────────────────────────────
 MODEL_PATH  = "yolov8n.pt"   # auto-downloaded on first run
 IMG_SIZE    = 640
-RESULTS_DIR = Path("results")
+RESULTS_DIR = Path(__file__).resolve().parent / "results"
 
 
 def get_device() -> str:
