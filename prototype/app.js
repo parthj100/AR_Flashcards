@@ -120,6 +120,7 @@ function navigate(hash) {
   window.location.hash = hash;
 }
 
+
 window.addEventListener('hashchange', () => {
   // Stop the camera if we're leaving the scan view
   if (window.location.hash !== '#scan' && RT.scan) {
