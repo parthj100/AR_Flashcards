@@ -3,6 +3,69 @@ const D = window.LENS_DATA;
 const $ = (sel, root = document) => root.querySelector(sel);
 const el = (html) => { const t = document.createElement('template'); t.innerHTML = html.trim(); return t.content.firstElementChild; };
 
+// ---------------------------------------------------------------------------
+// Persistence
+// ---------------------------------------------------------------------------
+// Three RT collections survive page reloads via localStorage:
+//   captures        — recent scan feed
+//   generatedCards  — LLM-produced cards (the "action" in offline RL terms)
+//   quizSessions    — quiz outcomes (the "reward")
+// Together these form the (state, action, reward) triples ALGORITHMS.md
+// describes. Persistence here is the unblocker referenced as the only
+// thing standing between the algorithmic framing and being able to train.
+//
+// Bounded to keep localStorage from growing unbounded. Versioned key prefix
+// so we can change the schema later without resurrecting stale data.
+const LENS_STORAGE_KEY    = 'lens.runtime.v1';
+const LENS_QUIZ_CAP       = 500;
+const LENS_CAPTURE_CAP    = 200;
+const LENS_GEN_CARD_CAP   = 200;
+
+function loadPersistedRT() {
+  try {
+    const raw = localStorage.getItem(LENS_STORAGE_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    return {
+      captures:       Array.isArray(parsed.captures)       ? parsed.captures       : [],
+      generatedCards: (parsed.generatedCards && typeof parsed.generatedCards === 'object')
+                        ? parsed.generatedCards : {},
+      quizSessions:   Array.isArray(parsed.quizSessions)   ? parsed.quizSessions   : [],
+    };
+  } catch (e) {
+    console.warn('lens: failed to read persisted runtime', e);
+    return null;
+  }
+}
+
+let _persistTimer = null;
+function persistRT() {
+  // Debounce — many writes per second during a quiz.
+  if (_persistTimer) return;
+  _persistTimer = setTimeout(() => {
+    _persistTimer = null;
+    try {
+      const snapshot = {
+        captures:       (RT.captures || []).slice(0, LENS_CAPTURE_CAP),
+        generatedCards: trimGeneratedCards(RT.generatedCards || {}, LENS_GEN_CARD_CAP),
+        quizSessions:   (RT.quizSessions || []).slice(0, LENS_QUIZ_CAP),
+      };
+      localStorage.setItem(LENS_STORAGE_KEY, JSON.stringify(snapshot));
+    } catch (e) {
+      console.warn('lens: failed to persist runtime', e);
+    }
+  }, 250);
+}
+
+function trimGeneratedCards(obj, cap) {
+  const ids = Object.keys(obj);
+  if (ids.length <= cap) return obj;
+  // Drop the oldest entries (insertion order is preserved in modern JS).
+  return Object.fromEntries(ids.slice(ids.length - cap).map(k => [k, obj[k]]));
+}
+
+const _persisted = loadPersistedRT();
+
 // Runtime state (outlives view mounts)
 const RT = window.LENS_RUNTIME = window.LENS_RUNTIME || {
   mlReady: false,       // true once CLIP has downloaded and indexed vocab
@@ -13,11 +76,43 @@ const RT = window.LENS_RUNTIME = window.LENS_RUNTIME || {
   scanMode: (function () {
     try { return localStorage.getItem('lens.scanMode') || 'single'; } catch { return 'single'; }
   })(),
-  generatedCards: {},   // id -> flashcard object produced by LLM
+  generatedCards: (_persisted && _persisted.generatedCards) || {},
   scan: null,           // active scan controller (camera + loop)
-  captures: [],         // newest-first: { id, topic, subject, grad, when, isGenerated }
-  quizSessions: [],     // newest-first: { cardId, correct, total, at }
+  captures:       (_persisted && _persisted.captures)       || [],
+  quizSessions:   (_persisted && _persisted.quizSessions)   || [],
   sessionStart: Date.now(),
+};
+
+// JSONL trajectory export — matches the schema in ALGORITHMS.md.
+// Run window.lensExportTrajectories() in the browser console to download
+// a .jsonl file containing one (s, a, r) triple per quiz session.
+window.lensExportTrajectories = function (filename = 'lens-trajectories.jsonl') {
+  const lines = (RT.quizSessions || []).map(sess => {
+    // A quiz session may aggregate over multiple cards; emit one trajectory
+    // per cardId with the aggregate reward divided by the queue length.
+    return (sess.cardIds || []).map(cardId => {
+      const card = (D.flashcards && D.flashcards[cardId]) || RT.generatedCards[cardId] || null;
+      const isGenerated = !!(RT.generatedCards[cardId]);
+      return JSON.stringify({
+        t: new Date(sess.at).toISOString(),
+        state: {
+          topic: cardId,
+          generated: isGenerated,
+        },
+        action: card,
+        reward: {
+          correct: sess.correct,
+          total:   sess.total,
+        },
+      });
+    }).join('\n');
+  }).filter(Boolean).join('\n');
+  const blob = new Blob([lines + '\n'], { type: 'application/jsonl' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = filename; a.click();
+  URL.revokeObjectURL(url);
+  return RT.quizSessions.length;
 };
 
 function setScanMode(mode) {
@@ -37,6 +132,7 @@ function recordCapture({ id, meta, isGenerated }) {
     when: now,
     isGenerated: !!isGenerated,
   });
+  persistRT();
 }
 
 // Human-readable "just now / 3m ago / 2h ago / yesterday / N days ago".
@@ -1452,6 +1548,7 @@ function renderQuiz(root, params) {
       total: queue.length,
       at: Date.now(),
     });
+    persistRT();
     const pct = Math.round((state.correct / queue.length) * 100);
     root.innerHTML = `
       <div class="app-shell">

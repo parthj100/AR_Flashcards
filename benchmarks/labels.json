@@ -1,0 +1,285 @@
+{
+  "version": 1,
+  "tier": 2,
+  "image_count": 30,
+  "fields": {
+    "image": "repo-relative path",
+    "gt_topic": "folder-name; used for CLIP routing accuracy",
+    "clip_routing_id": "expected CLIP top-1 id; usually = gt_topic",
+    "gt_card_id": "authored card id in prototype/data.js, or null",
+    "gt_box": "[x, y, w, h] in pixels, or null until labelled",
+    "gt_text": "ground-truth OCR transcript, or null"
+  },
+  "labels": [
+    {
+      "image": "images/raw/microscope/microscope_compound_microscope_school_lab_000001.jpg",
+      "gt_topic": "microscope",
+      "clip_routing_id": "microscope",
+      "gt_card_id": null,
+      "gt_box": null,
+      "gt_text": null,
+      "notes": "TODO: verify; add gt_box if doing IoU rewards"
+    },
+    {
+      "image": "images/raw/microscope/microscope_compound_microscope_school_lab_000002.jpg",
+      "gt_topic": "microscope",
+      "clip_routing_id": "microscope",
+      "gt_card_id": null,
+      "gt_box": null,
+      "gt_text": null,
+      "notes": "TODO: verify; add gt_box if doing IoU rewards"
+    },
+    {
+      "image": "images/raw/microscope/microscope_compound_microscope_school_lab_000003.jpg",
+      "gt_topic": "microscope",
+      "clip_routing_id": "microscope",
+      "gt_card_id": null,
+      "gt_box": null,
+      "gt_text": null,
+      "notes": "TODO: verify; add gt_box if doing IoU rewards"
+    },
+    {
+      "image": "images/raw/microscope/microscope_compound_microscope_school_lab_000004.jpg",
+      "gt_topic": "microscope",
+      "clip_routing_id": "microscope",
+      "gt_card_id": null,
+      "gt_box": null,
+      "gt_text": null,
+      "notes": "TODO: verify; add gt_box if doing IoU rewards"
+    },
+    {
+      "image": "images/raw/microscope/microscope_compound_microscope_school_lab_000005.jpg",
+      "gt_topic": "microscope",
+      "clip_routing_id": "microscope",
+      "gt_card_id": null,
+      "gt_box": null,
+      "gt_text": null,
+      "notes": "TODO: verify; add gt_box if doing IoU rewards"
+    },
+    {
+      "image": "images/raw/calculator/calculator_calculator_and_math_textbook_000001.jpg",
+      "gt_topic": "calculator",
+      "clip_routing_id": "calculator",
+      "gt_card_id": null,
+      "gt_box": null,
+      "gt_text": null,
+      "notes": "TODO: verify; add gt_box if doing IoU rewards"
+    },
+    {
+      "image": "images/raw/calculator/calculator_calculator_and_math_textbook_000002.jpg",
+      "gt_topic": "calculator",
+      "clip_routing_id": "calculator",
+      "gt_card_id": null,
+      "gt_box": null,
+      "gt_text": null,
+      "notes": "TODO: verify; add gt_box if doing IoU rewards"
+    },
+    {
+      "image": "images/raw/calculator/calculator_calculator_and_math_textbook_000003.jpg",
+      "gt_topic": "calculator",
+      "clip_routing_id": "calculator",
+      "gt_card_id": null,
+      "gt_box": null,
+      "gt_text": null,
+      "notes": "TODO: verify; add gt_box if doing IoU rewards"
+    },
+    {
+      "image": "images/raw/calculator/calculator_calculator_and_math_textbook_000004.jpg",
+      "gt_topic": "calculator",
+      "clip_routing_id": "calculator",
+      "gt_card_id": null,
+      "gt_box": null,
+      "gt_text": null,
+      "notes": "TODO: verify; add gt_box if doing IoU rewards"
+    },
+    {
+      "image": "images/raw/calculator/calculator_calculator_and_math_textbook_000005.jpg",
+      "gt_topic": "calculator",
+      "clip_routing_id": "calculator",
+      "gt_card_id": null,
+      "gt_box": null,
+      "gt_text": null,
+      "notes": "TODO: verify; add gt_box if doing IoU rewards"
+    },
+    {
+      "image": "images/raw/backpack/backpack_school_backpack_on_desk_000001.jpg",
+      "gt_topic": "backpack",
+      "clip_routing_id": "backpack",
+      "gt_card_id": null,
+      "gt_box": null,
+      "gt_text": null,
+      "notes": "TODO: verify; add gt_box if doing IoU rewards"
+    },
+    {
+      "image": "images/raw/backpack/backpack_school_backpack_on_desk_000003.jpg",
+      "gt_topic": "backpack",
+      "clip_routing_id": "backpack",
+      "gt_card_id": null,
+      "gt_box": null,
+      "gt_text": null,
+      "notes": "TODO: verify; add gt_box if doing IoU rewards"
+    },
+    {
+      "image": "images/raw/backpack/backpack_school_backpack_on_desk_000004.jpg",
+      "gt_topic": "backpack",
+      "clip_routing_id": "backpack",
+      "gt_card_id": null,
+      "gt_box": null,
+      "gt_text": null,
+      "notes": "TODO: verify; add gt_box if doing IoU rewards"
+    },
+    {
+      "image": "images/raw/backpack/backpack_school_backpack_on_desk_000005.jpg",
+      "gt_topic": "backpack",
+      "clip_routing_id": "backpack",
+      "gt_card_id": null,
+      "gt_box": null,
+      "gt_text": null,
+      "notes": "TODO: verify; add gt_box if doing IoU rewards"
+    },
+    {
+      "image": "images/raw/backpack/backpack_school_backpack_on_desk_000006.jpg",
+      "gt_topic": "backpack",
+      "clip_routing_id": "backpack",
+      "gt_card_id": null,
+      "gt_box": null,
+      "gt_text": null,
+      "notes": "TODO: verify; add gt_box if doing IoU rewards"
+    },
+    {
+      "image": "images/raw/periodic_table_poster/periodic_table_poster_chemistry_classroom_with_perio_000001.jpg",
+      "gt_topic": "periodic_table_poster",
+      "clip_routing_id": "periodic_table_poster",
+      "gt_card_id": "periodic-table",
+      "gt_box": null,
+      "gt_text": null,
+      "notes": "TODO: verify; add gt_box if doing IoU rewards"
+    },
+    {
+      "image": "images/raw/periodic_table_poster/periodic_table_poster_chemistry_classroom_with_perio_000002.jpg",
+      "gt_topic": "periodic_table_poster",
+      "clip_routing_id": "periodic_table_poster",
+      "gt_card_id": "periodic-table",
+      "gt_box": null,
+      "gt_text": null,
+      "notes": "TODO: verify; add gt_box if doing IoU rewards"
+    },
+    {
+      "image": "images/raw/periodic_table_poster/periodic_table_poster_chemistry_classroom_with_perio_000003.jpg",
+      "gt_topic": "periodic_table_poster",
+      "clip_routing_id": "periodic_table_poster",
+      "gt_card_id": "periodic-table",
+      "gt_box": null,
+      "gt_text": null,
+      "notes": "TODO: verify; add gt_box if doing IoU rewards"
+    },
+    {
+      "image": "images/raw/periodic_table_poster/periodic_table_poster_chemistry_classroom_with_perio_000004.jpg",
+      "gt_topic": "periodic_table_poster",
+      "clip_routing_id": "periodic_table_poster",
+      "gt_card_id": "periodic-table",
+      "gt_box": null,
+      "gt_text": null,
+      "notes": "TODO: verify; add gt_box if doing IoU rewards"
+    },
+    {
+      "image": "images/raw/periodic_table_poster/periodic_table_poster_chemistry_classroom_with_perio_000005.jpg",
+      "gt_topic": "periodic_table_poster",
+      "clip_routing_id": "periodic_table_poster",
+      "gt_card_id": "periodic-table",
+      "gt_box": null,
+      "gt_text": null,
+      "notes": "TODO: verify; add gt_box if doing IoU rewards"
+    },
+    {
+      "image": "images/raw/globe_model/globe_model_classroom_globe_on_teacher_des_000001.jpg",
+      "gt_topic": "globe_model",
+      "clip_routing_id": "globe_model",
+      "gt_card_id": null,
+      "gt_box": null,
+      "gt_text": null,
+      "notes": "TODO: verify; add gt_box if doing IoU rewards"
+    },
+    {
+      "image": "images/raw/globe_model/globe_model_classroom_globe_on_teacher_des_000002.jpg",
+      "gt_topic": "globe_model",
+      "clip_routing_id": "globe_model",
+      "gt_card_id": null,
+      "gt_box": null,
+      "gt_text": null,
+      "notes": "TODO: verify; add gt_box if doing IoU rewards"
+    },
+    {
+      "image": "images/raw/globe_model/globe_model_classroom_globe_on_teacher_des_000003.jpg",
+      "gt_topic": "globe_model",
+      "clip_routing_id": "globe_model",
+      "gt_card_id": null,
+      "gt_box": null,
+      "gt_text": null,
+      "notes": "TODO: verify; add gt_box if doing IoU rewards"
+    },
+    {
+      "image": "images/raw/globe_model/globe_model_classroom_globe_on_teacher_des_000004.jpg",
+      "gt_topic": "globe_model",
+      "clip_routing_id": "globe_model",
+      "gt_card_id": null,
+      "gt_box": null,
+      "gt_text": null,
+      "notes": "TODO: verify; add gt_box if doing IoU rewards"
+    },
+    {
+      "image": "images/raw/globe_model/globe_model_classroom_globe_on_teacher_des_000005.jpg",
+      "gt_topic": "globe_model",
+      "clip_routing_id": "globe_model",
+      "gt_card_id": null,
+      "gt_box": null,
+      "gt_text": null,
+      "notes": "TODO: verify; add gt_box if doing IoU rewards"
+    },
+    {
+      "image": "images/raw/safety_goggles/safety_goggles_protective_lab_glasses_close_u_000001.jpg",
+      "gt_topic": "safety_goggles",
+      "clip_routing_id": "safety_goggles",
+      "gt_card_id": null,
+      "gt_box": null,
+      "gt_text": null,
+      "notes": "TODO: verify; add gt_box if doing IoU rewards"
+    },
+    {
+      "image": "images/raw/safety_goggles/safety_goggles_protective_lab_glasses_close_u_000002.jpg",
+      "gt_topic": "safety_goggles",
+      "clip_routing_id": "safety_goggles",
+      "gt_card_id": null,
+      "gt_box": null,
+      "gt_text": null,
+      "notes": "TODO: verify; add gt_box if doing IoU rewards"
+    },
+    {
+      "image": "images/raw/safety_goggles/safety_goggles_protective_lab_glasses_close_u_000003.jpg",
+      "gt_topic": "safety_goggles",
+      "clip_routing_id": "safety_goggles",
+      "gt_card_id": null,
+      "gt_box": null,
+      "gt_text": null,
+      "notes": "TODO: verify; add gt_box if doing IoU rewards"
+    },
+    {
+      "image": "images/raw/safety_goggles/safety_goggles_protective_lab_glasses_close_u_000004.jpg",
+      "gt_topic": "safety_goggles",
+      "clip_routing_id": "safety_goggles",
+      "gt_card_id": null,
+      "gt_box": null,
+      "gt_text": null,
+      "notes": "TODO: verify; add gt_box if doing IoU rewards"
+    },
+    {
+      "image": "images/raw/safety_goggles/safety_goggles_protective_lab_glasses_close_u_000005.jpg",
+      "gt_topic": "safety_goggles",
+      "clip_routing_id": "safety_goggles",
+      "gt_card_id": null,
+      "gt_box": null,
+      "gt_text": null,
+      "notes": "TODO: verify; add gt_box if doing IoU rewards"
+    }
+  ]
+}
