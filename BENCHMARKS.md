@@ -199,15 +199,32 @@ The same script gives strikingly different per-agent decompositions
 depending on which cohort it runs against, which is itself an
 illustration of why the per-agent decomposition matters:
 
-| Cohort | YOLO_R | OCR_R | LLM_R | Joint |
-|---|---:|---:|---:|---:|
-| Update-5 school objects (12 images, `dataset/images/raw/`) | 0.40 | 0.52 | 1.00 | 0.66 |
-| Text problems (5 images, `OCR/test_images/`) | 0.10 | 0.89 | 1.00 | 0.62 |
+| Cohort | n | YOLO_R | OCR_R | LLM_R | Joint |
+|---|---:|---:|---:|---:|---:|
+| Update-5 school objects (`dataset/images/raw/`) | 554 | 0.5585 | 0.5215 | 0.9892 | **0.7234** |
+| Text problems (`OCR/test_images/`) | 5 | 0.0999 | 0.8873 | 1.0000 | **0.6174** |
 
-The joint scores are nearly identical. The contributions are not.
-School-object scans depend on YOLO; text-bearing scans depend on OCR.
-A single joint number would have hidden this — the decomposition makes
-the *which agent did the work* visible. Run the second cohort with:
+The joint scores differ by less than 11 points. The per-agent
+contributions invert almost completely: school-object scans depend on
+YOLO and OCR roughly equally with LLM near-perfect; text-bearing scans
+have YOLO collapse (0.10 — COCO classes don't cover whiteboards), OCR
+shoots up (0.89 — text is the whole point), LLM still 1.0. A single
+joint number would have hidden the divergent provenance — the
+decomposition makes the *which agent did the work* visible.
+
+The school-objects number is paper-grade (n=554, full Update-5 dataset,
+~3 h wall clock with all four sidecars live on Apple M2). The
+text-problems number is a small held-out probe — useful for the
+qualitative point about cohort sensitivity, not for headline claims.
+
+Of note: across 554 LLM calls, **6 dropped the JSON schema** (0.989
+schema-valid rate). First non-trivial sample showing Phi-3 isn't
+perfectly reliable on `format=schema` — worth flagging as an artifact
+the algorithmic story will need to handle (BC will pin behavior closer
+to the authored cards, which never have schema failures by
+construction).
+
+Run the text cohort with:
 
 ```
 python benchmarks/benchmark_rewards.py --images-dir OCR/test_images --flat --limit 5

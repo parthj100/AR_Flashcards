@@ -192,24 +192,31 @@ the current repo state.
 
 ## What the L3 reward decomposition looks like in practice
 
-The first run of [benchmark_rewards.py](benchmarks/benchmark_rewards.py)
-on 12 images (all four agents live, Tier 1 confidences as rewards):
+[benchmark_rewards.py](benchmarks/benchmark_rewards.py) on the full
+Update-5 dataset (all four agents live, Tier 1 confidences as rewards):
 
 | agent | n | mean reward |
 |---|---:|---:|
-| yolo | 12 | 0.4017 |
-| ocr  | 12 | 0.5159 |
-| llm  | 12 | 1.0000 |
-| **joint** | 12 | **0.6639** |
+| yolo | 554 | 0.5585 |
+| ocr  | 554 | 0.5215 |
+| llm  | 554 | 0.9892 |
+| **joint** | 554 | **0.7234** |
 
-The LLM scoring 1.0 is *the* useful illustration of why Tier 1 is just
-a starting point: every generated card was schema-valid, but several
-were generated for nonsense topics like `parking meter` (a goggles
-image YOLO labeled as parking meter, then CLIP would have re-routed in
-the live UI but doesn't in this benchmark path). Tier 2 will replace
-the schema-validity signal with a tone-cosine and factuality check
-against authored expert cards, which will discriminate between "valid
-JSON for the right card" and "valid JSON for nonsense."
+The 0.989 LLM rate (i.e. 6 schema failures across 554 calls) is the
+first crack in the previously-perfect schema-validity claim. Phi-3
+under `format=schema` is *very* reliable but not bulletproof. This is
+useful: it means the BC-on-authored-cards leg of [ALGORITHMS.md](ALGORITHMS.md)
+has a measurable improvement to make over the raw model — authored
+cards never have schema failures by construction.
+
+The LLM-scoring-near-1.0 is still the useful illustration of why Tier 1
+is a starting point: most generated cards were schema-valid even when
+the topic the LLM saw was nonsense (e.g. `parking meter` for a goggles
+image, where YOLO mislabeled the box and the benchmark fed the wrong
+topic forward). Tier 2 will replace the schema-validity signal with a
+tone-cosine and factuality check against authored expert cards, which
+will discriminate between "valid JSON for the right card" and "valid
+JSON for nonsense."
 
 ## Open question for the reviewer
 
