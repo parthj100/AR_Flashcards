@@ -1,0 +1,31 @@
+image,joint_reward,llm_ms,llm_reward,llm_schema_valid,llm_topic,ocr_conf,ocr_lines,ocr_ms,ocr_reward,yolo_conf,yolo_ms,yolo_reward,yolo_top
+microscope/microscope_compound_microscope_school_lab_000001.jpg,0.6667,7133.2,0.5,True,None,0.9005,9,14764.9,1.0,0.0000,171.1,,None
+microscope/microscope_compound_microscope_school_lab_000002.jpg,0.8,6795.7,0.5,True,airplane,0.9969,1,3791.1,1.0,0.2669,503.0,1.0,airplane
+microscope/microscope_compound_microscope_school_lab_000003.jpg,0.75,7093.4,0.5,True,traffic light,0.0000,0,478.1,,0.5549,220.5,1.0,traffic light
+microscope/microscope_compound_microscope_school_lab_000004.jpg,0.8,7035.1,0.5,True,bottle,0.9274,9,3563.1,1.0,0.3228,67.7,1.0,bottle
+microscope/microscope_compound_microscope_school_lab_000005.jpg,0.8,6806.9,0.5,True,bottle,0.7216,3,7578.8,1.0,0.8308,216.5,1.0,bottle
+calculator/calculator_calculator_and_math_textbook_000001.jpg,0.8,9738.8,0.5,True,remote,0.8809,27,10311.6,1.0,0.9145,287.5,1.0,remote
+calculator/calculator_calculator_and_math_textbook_000002.jpg,0.8,7975.6,0.5,True,book,0.8636,86,9779.2,1.0,0.4104,388.8,1.0,book
+calculator/calculator_calculator_and_math_textbook_000003.jpg,0.8,8958.4,0.5,True,remote,0.8607,85,8829.1,1.0,0.6074,460.9,1.0,remote
+calculator/calculator_calculator_and_math_textbook_000004.jpg,0.75,9454.4,0.5,True,laptop,0.0000,0,1250.0,,0.7718,351.6,1.0,laptop
+calculator/calculator_calculator_and_math_textbook_000005.jpg,0.75,7462.5,0.5,True,cell phone,0.0000,0,1552.9,,0.6011,294.1,1.0,cell phone
+backpack/backpack_school_backpack_on_desk_000001.jpg,1.0,9050.4,1.0,True,backpack,0.0000,0,949.5,,0.6674,93.0,1.0,backpack
+backpack/backpack_school_backpack_on_desk_000003.jpg,0.5,10557.2,0.0,False,chair,0.0000,0,995.7,,0.4678,239.1,1.0,chair
+backpack/backpack_school_backpack_on_desk_000004.jpg,0.8,7356.0,0.5,True,suitcase,0.8551,11,6060.6,1.0,0.8660,279.0,1.0,suitcase
+backpack/backpack_school_backpack_on_desk_000005.jpg,0.8,10736.9,0.5,True,potted plant,0.8243,13,5722.2,1.0,0.6349,129.5,1.0,potted plant
+backpack/backpack_school_backpack_on_desk_000006.jpg,0.75,10099.3,0.5,True,remote,0.0000,0,1034.2,,0.4644,258.3,1.0,remote
+periodic_table_poster/periodic_table_poster_chemistry_classroom_with_perio_000001.jpg,0.8,8131.3,0.5,True,book,0.8887,7,304.5,1.0,0.3680,88.3,1.0,book
+periodic_table_poster/periodic_table_poster_chemistry_classroom_with_perio_000002.jpg,0.6667,7548.7,0.5,True,None,0.9603,191,4923.0,1.0,0.0000,171.0,,None
+periodic_table_poster/periodic_table_poster_chemistry_classroom_with_perio_000003.jpg,0.8,8087.0,0.5,True,book,0.8921,376,29655.4,1.0,0.3033,488.3,1.0,book
+periodic_table_poster/periodic_table_poster_chemistry_classroom_with_perio_000004.jpg,0.6667,6770.8,0.5,True,None,0.7692,4,646.6,1.0,0.0000,585.3,,None
+periodic_table_poster/periodic_table_poster_chemistry_classroom_with_perio_000005.jpg,0.8,7071.9,0.5,True,book,0.9129,161,5628.0,1.0,0.3095,200.7,1.0,book
+globe_model/globe_model_classroom_globe_on_teacher_des_000001.jpg,0.75,8233.2,0.5,True,vase,0.0000,0,1129.2,,0.8728,230.2,1.0,vase
+globe_model/globe_model_classroom_globe_on_teacher_des_000002.jpg,0.75,6854.7,0.5,True,dining table,0.0000,0,1376.3,,0.5781,341.2,1.0,dining table
+globe_model/globe_model_classroom_globe_on_teacher_des_000003.jpg,0.75,7537.9,0.5,True,vase,0.0000,0,1130.4,,0.4300,242.5,1.0,vase
+globe_model/globe_model_classroom_globe_on_teacher_des_000004.jpg,0.6,9962.2,0.0,False,wine glass,0.8106,3,7535.9,1.0,0.8046,198.2,1.0,wine glass
+globe_model/globe_model_classroom_globe_on_teacher_des_000005.jpg,0.75,7369.3,0.5,True,vase,0.0000,0,721.2,,0.4907,121.8,1.0,vase
+safety_goggles/safety_goggles_protective_lab_glasses_close_u_000001.jpg,0.6667,5598.1,0.5,True,None,0.6993,7,6392.2,1.0,0.0000,128.2,,None
+safety_goggles/safety_goggles_protective_lab_glasses_close_u_000002.jpg,0.75,8367.6,0.5,True,parking meter,0.0000,0,1192.2,,0.2750,373.8,1.0,parking meter
+safety_goggles/safety_goggles_protective_lab_glasses_close_u_000003.jpg,0.75,7910.5,0.5,True,person,0.0000,0,578.5,,0.8610,120.1,1.0,person
+safety_goggles/safety_goggles_protective_lab_glasses_close_u_000004.jpg,0.5,7017.6,0.5,True,None,0.0000,0,687.3,,0.0000,291.8,,None
+safety_goggles/safety_goggles_protective_lab_glasses_close_u_000005.jpg,0.75,9313.5,0.5,True,person,0.0000,0,1303.8,,0.8630,220.8,1.0,person
