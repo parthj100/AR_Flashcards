@@ -64,15 +64,28 @@ DEFAULT_CLASSES = [
 IMAGE_EXTS = {".jpg", ".jpeg", ".png", ".webp"}
 
 
-def collect_images(images_dir: Path, classes: list[str], limit: int) -> list[tuple[str, Path]]:
-    out = []
-    for cls in classes:
-        d = images_dir / cls
-        if not d.is_dir():
-            continue
-        for p in sorted(d.iterdir()):
-            if p.suffix.lower() in IMAGE_EXTS:
-                out.append((cls, p))
+def collect_images(images_dir: Path, classes: list[str], limit: int, *,
+                   flat: bool = False) -> list[tuple[str, Path]]:
+    """Collect images for the benchmark.
+
+    flat=False (default): expects images_dir/<class>/*.jpg layout.
+    flat=True: takes every image directly under images_dir, using the file
+    stem as the class label (handy for OCR/test_images and other small
+    labelled-by-filename sets).
+    """
+    out: list[tuple[str, Path]] = []
+    if flat:
+        for p in sorted(Path(images_dir).iterdir()):
+            if p.is_file() and p.suffix.lower() in IMAGE_EXTS:
+                out.append((p.stem, p))
+    else:
+        for cls in classes:
+            d = images_dir / cls
+            if not d.is_dir():
+                continue
+            for p in sorted(d.iterdir()):
+                if p.suffix.lower() in IMAGE_EXTS:
+                    out.append((cls, p))
     if limit and limit > 0:
         per_class: dict[str, list[Path]] = defaultdict(list)
         for cls, p in out:
@@ -149,7 +162,8 @@ def run(args):
 
     weights = {"yolo": args.w_yolo, "ocr": args.w_ocr, "llm": args.w_llm}
 
-    images = collect_images(Path(args.images_dir), args.classes, args.limit)
+    images = collect_images(Path(args.images_dir), args.classes, args.limit,
+                            flat=args.flat)
     if not images:
         print(f"\n  ERROR: no images under {args.images_dir}")
         return 1
@@ -334,6 +348,10 @@ def main():
     p = argparse.ArgumentParser(description="Per-agent reward decomposition (Tier 1)")
     p.add_argument("--images-dir", default=DEFAULT_IMAGES_DIR)
     p.add_argument("--classes",    nargs="+", default=DEFAULT_CLASSES)
+    p.add_argument("--flat",       action="store_true",
+                   help="treat --images-dir as a flat folder of images "
+                        "(file stem becomes the class label). Use for "
+                        "OCR/test_images and similar small labelled sets.")
     p.add_argument("--limit",      type=int, default=20)
     p.add_argument("--yolo",       default=DEFAULT_YOLO)
     p.add_argument("--ocr",        default=DEFAULT_OCR)
