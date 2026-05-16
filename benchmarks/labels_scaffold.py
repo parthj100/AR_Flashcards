@@ -79,8 +79,12 @@ def main():
         return 1
 
     labels = []
+    repo_root = Path.cwd()
     for cls, path in images:
-        rel = path.relative_to(Path(args.images_dir).parent.parent)  # repo-relative
+        try:
+            rel = path.resolve().relative_to(repo_root)
+        except ValueError:
+            rel = path  # fall back to the path as given
         labels.append({
             "image":            str(rel),
             "gt_topic":         cls,                          # auto

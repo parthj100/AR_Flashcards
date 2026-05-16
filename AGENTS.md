@@ -213,10 +213,48 @@ The LLM-scoring-near-1.0 is still the useful illustration of why Tier 1
 is a starting point: most generated cards were schema-valid even when
 the topic the LLM saw was nonsense (e.g. `parking meter` for a goggles
 image, where YOLO mislabeled the box and the benchmark fed the wrong
-topic forward). Tier 2 will replace the schema-validity signal with a
-tone-cosine and factuality check against authored expert cards, which
-will discriminate between "valid JSON for the right card" and "valid
-JSON for nonsense."
+topic forward).
+
+### Tier 2 confirms the schema-validity ceiling is hiding a real gap
+
+The Tier-2 reward function replaces `schema-valid ? 1 : 0` with a
+topic-match check (does the LLM's generated `name` or `subject`
+actually reference the ground-truth topic?). Run on the 30-image
+labeled subset, all sidecars live:
+
+| reward | n  | Tier 1 | Tier 2 | Δ |
+|---|---:|---:|---:|---:|
+| LLM_R  | 30 | ~0.99 | 0.4833 | **−51 pp** |
+
+That drop is the entire "valid JSON for nonsense" problem made
+visible. It is also the open improvement target for the
+BC-on-authored-cards leg of [ALGORITHMS.md](ALGORITHMS.md) — closing
+that gap is what training does.
+
+The Tier-2 YOLO_R and OCR_R rewards are 1.0 on the same 30 because
+the labels were auto-suggested by the same agents being scored;
+those numbers stay placeholder-true until the rows in
+`benchmarks/labels.json` get a human review pass and the `verified`
+flag flips. See [BENCHMARKS.md](BENCHMARKS.md) for the methodology.
+
+### Per-agent quality also has a new datapoint: CLIP 95% top-1
+
+After `transformers` was installed, [OCR/pipeline_benchmark.py](OCR/pipeline_benchmark.py)
+could finally exercise the CLIP agent from Python and run the Single
+and Multi prototype modes end-to-end. Headline:
+
+| agent          | avg ms | FPS  | accuracy |
+|---|---:|---:|---:|
+| YOLO (n)       | 54.1   | 18.5 | 30.0%    |
+| EasyOCR        | 666.5  | 1.5  | 100.0%   |
+| **CLIP (B/32)**| 78.4   | 12.8 | **95.0%**|
+| Phi-3 (mini)   | 4871.6 | 0.2  | 100.0%   |
+
+CLIP 95% vs YOLO 30% is the cleanest evidence we have that on the
+Update-5 dataset the *recognition* job belongs to CLIP and the
+*localization* job belongs to YOLO — exactly the architecture
+[README.md "Why YOLO plus CLIP"](README.md) argues for, now backed
+by numbers.
 
 ## Open question for the reviewer
 

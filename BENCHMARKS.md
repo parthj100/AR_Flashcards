@@ -181,17 +181,43 @@ even though the card is pedagogically useless. That's exactly the
 *credit-assignment* problem AGENTS.md flags as why end-to-end
 benchmarking is hard.
 
-**Tier 2** (Update 6 backlog) replaces these with accuracy against a
-small labeled evaluation set:
+**Tier 2** is now wired and runnable. Reward functions are:
 
 - `YOLO_R` → IoU vs ground-truth box
 - `OCR_R`  → 1 − CER vs ground-truth text
-- `LLM_R`  → tone-cosine + sampled factuality check
-- `Joint`  → quiz-success rate from the persisted `RT.quizSessions`
+- `LLM_R`  → 1.0 if the LLM's `name` or `subject` contains the GT
+  topic/card-id, else 0.5 × schema-validity (so Tier-2 never scores
+  *below* Tier-1 on the same row)
+- `Joint`  → weighted mean (same default weights as Tier 1)
 
-Same script, different reward functions. The plan is to label ~30
-images (one per topic) and swap in `--labels benchmarks/labels.json` to
-get Tier-2 numbers for the paper.
+Pipeline:
+```
+python benchmarks/labels_scaffold.py        # generates 30-entry skeleton
+python benchmarks/auto_label.py             # fills gt_box / gt_text from agents
+# (optional) hand-correct rows in benchmarks/labels.json, set verified=true
+python benchmarks/benchmark_rewards.py --tier 2 \
+    --labels benchmarks/labels.json --use-labels-only
+```
+
+#### First Tier-2 run (auto-suggested labels, n=30)
+
+| reward | n  | mean | what it actually measures here |
+|---|---:|---:|---|
+| YOLO_R   | 25 | 1.0000 | IoU vs YOLO's own suggested box ⇒ **circular**, treat as 1.0 by construction until human review |
+| OCR_R    | 16 | 1.0000 | 1−CER vs EasyOCR's own transcript ⇒ **circular** for the same reason |
+| LLM_R    | 30 | 0.4833 | LLM `name`/`subject` containment of `gt_topic` ⇒ **not** circular; first non-trivial Tier-2 signal |
+| Joint    | 30 | 0.7439 | weighted mean of the three |
+
+The LLM Tier-2 number is the interesting one. Tier 1 reports
+`LLM_R = 0.99` on the same images; Tier 2 reports **0.48**. That ~50 pp
+drop is the schema-validity ceiling falling away: the LLM is generating
+parseable JSON about the right *thing* only about half the time. This
+is the exact "valid JSON for nonsense" failure mode AGENTS.md flagged.
+
+The YOLO/OCR numbers will become non-trivial once a human reviews the
+`benchmarks/labels.json` rows and corrects boxes/transcripts; the
+`auto_label.py` script intentionally writes `verified: false` on every
+row to make that step's bookkeeping visible.
 
 #### Two image cohorts already produce useful Tier-1 numbers
 
