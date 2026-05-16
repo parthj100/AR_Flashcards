@@ -1,5 +1,18 @@
+# AR Flashcards — YOLOv8 Detection dependencies
+
+# FastAPI sidecar (serve.py)
 fastapi>=0.110
 uvicorn[standard]>=0.27
-ultralytics>=8.2
-pillow>=10.0
 pydantic>=2.6
+
+# Detection / inference
+ultralytics>=8.2
+torch>=2.2
+torchvision>=0.17
+
+# Image I/O
+pillow>=10.0
+opencv-python>=4.10
+
+# OCR (Stage 2)
+paddleocr>=2.8
