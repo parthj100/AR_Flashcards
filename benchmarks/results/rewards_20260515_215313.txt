@@ -1,0 +1,54 @@
+Multi-Agent Pipeline Rewards (AR Flashcard Tutor)
+================================================================
+
+Images processed:   12
+Wall clock:         159.37 s
+Mean per-image:     13281 ms
+Reward weights:     yolo=0.4  ocr=0.2  llm=0.4
+Tier:               1 (self-reported confidence + schema validity; no labels)
+
+Agent Trajectory:
+  [yolo_agent]    img=microscope/microscope_compound_microscope_school_lab_000001.jpg  top=None            conf=0.000  n_det=0  | 677.9 ms
+  [ocr_agent]     img=microscope/microscope_compound_microscope_school_lab_000001.jpg  lines=9    mean_conf=0.901            | 10897 ms
+  [llm_agent]     topic=None                    schema=✓  tokens=342  tps=63.4 | 9262 ms
+  [yolo_agent]    img=microscope/microscope_compound_microscope_school_lab_000002.jpg  top=airplane        conf=0.267  n_det=1  | 1246.8 ms
+  [ocr_agent]     img=microscope/microscope_compound_microscope_school_lab_000002.jpg  lines=1    mean_conf=0.997            | 4449 ms
+  [llm_agent]     topic=airplane                schema=✓  tokens=476  tps=61.0 | 9510 ms
+  [yolo_agent]    img=calculator/calculator_calculator_and_math_textbook_000001.jpg  top=remote          conf=0.914  n_det=2  | 437.0 ms
+  [ocr_agent]     img=calculator/calculator_calculator_and_math_textbook_000001.jpg  lines=27   mean_conf=0.881            | 10631 ms
+  [llm_agent]     topic=remote                  schema=✓  tokens=498  tps=59.3 | 10234 ms
+  [yolo_agent]    img=calculator/calculator_calculator_and_math_textbook_000002.jpg  top=book            conf=0.410  n_det=3  | 577.0 ms
+  [ocr_agent]     img=calculator/calculator_calculator_and_math_textbook_000002.jpg  lines=86   mean_conf=0.864            | 10383 ms
+  [llm_agent]     topic=book                    schema=✓  tokens=390  tps=60.5 | 7840 ms
+  [yolo_agent]    img=backpack/backpack_school_backpack_on_desk_000001.jpg  top=backpack        conf=0.667  n_det=2  | 524.1 ms
+  [ocr_agent]     img=backpack/backpack_school_backpack_on_desk_000001.jpg  lines=0    mean_conf=0.000            | 1420 ms
+  [llm_agent]     topic=backpack                schema=✓  tokens=374  tps=62.0 | 7229 ms
+  [yolo_agent]    img=backpack/backpack_school_backpack_on_desk_000003.jpg  top=chair           conf=0.468  n_det=3  | 239.6 ms
+  [ocr_agent]     img=backpack/backpack_school_backpack_on_desk_000003.jpg  lines=0    mean_conf=0.000            | 834 ms
+  [llm_agent]     topic=chair                   schema=✓  tokens=479  tps=62.3 | 9177 ms
+  [yolo_agent]    img=periodic_table_poster/periodic_table_poster_chemistry_classroom_with_perio_000001.jpg  top=book            conf=0.368  n_det=1  | 431.7 ms
+  [ocr_agent]     img=periodic_table_poster/periodic_table_poster_chemistry_classroom_with_perio_000001.jpg  lines=7    mean_conf=0.889            | 366 ms
+  [llm_agent]     topic=book                    schema=✓  tokens=353  tps=62.3 | 6805 ms
+  [yolo_agent]    img=periodic_table_poster/periodic_table_poster_chemistry_classroom_with_perio_000002.jpg  top=None            conf=0.000  n_det=0  | 197.0 ms
+  [ocr_agent]     img=periodic_table_poster/periodic_table_poster_chemistry_classroom_with_perio_000002.jpg  lines=191  mean_conf=0.960            | 4380 ms
+  [llm_agent]     topic=None                    schema=✓  tokens=351  tps=60.3 | 7024 ms
+  [yolo_agent]    img=globe_model/globe_model_classroom_globe_on_teacher_des_000001.jpg  top=vase            conf=0.873  n_det=2  | 113.5 ms
+  [ocr_agent]     img=globe_model/globe_model_classroom_globe_on_teacher_des_000001.jpg  lines=0    mean_conf=0.000            | 1411 ms
+  [llm_agent]     topic=vase                    schema=✓  tokens=399  tps=61.8 | 7738 ms
+  [yolo_agent]    img=globe_model/globe_model_classroom_globe_on_teacher_des_000002.jpg  top=dining table    conf=0.578  n_det=1  | 180.6 ms
+  [ocr_agent]     img=globe_model/globe_model_classroom_globe_on_teacher_des_000002.jpg  lines=0    mean_conf=0.000            | 1409 ms
+  [llm_agent]     topic=dining table            schema=✓  tokens=423  tps=56.2 | 8870 ms
+  [yolo_agent]    img=safety_goggles/safety_goggles_protective_lab_glasses_close_u_000001.jpg  top=None            conf=0.000  n_det=0  | 383.9 ms
+  [ocr_agent]     img=safety_goggles/safety_goggles_protective_lab_glasses_close_u_000001.jpg  lines=7    mean_conf=0.699            | 7564 ms
+  [llm_agent]     topic=None                    schema=✓  tokens=368  tps=56.0 | 7779 ms
+  [yolo_agent]    img=safety_goggles/safety_goggles_protective_lab_glasses_close_u_000002.jpg  top=parking meter   conf=0.275  n_det=1  | 286.9 ms
+  [ocr_agent]     img=safety_goggles/safety_goggles_protective_lab_glasses_close_u_000002.jpg  lines=0    mean_conf=0.000            | 1157 ms
+  [llm_agent]     topic=parking meter           schema=✓  tokens=368  tps=56.5 | 7666 ms
+
+YOLO Reward (mean):    0.4017   (n=12)
+OCR Reward  (mean):    0.5159   (n=12)
+LLM Reward  (mean):    1.0000   (n=12, schema-valid rate 100.00%)
+Joint Reward (mean):   0.6639   (n=12)
+
+Total Spend:           $0.00 (all-local inference, no cloud calls)
+Schema-validity rate:  100.0%

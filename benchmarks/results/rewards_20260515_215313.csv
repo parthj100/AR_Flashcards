@@ -1,0 +1,13 @@
+image,joint_reward,llm_ms,llm_reward,llm_schema_valid,llm_topic,ocr_conf,ocr_lines,ocr_ms,ocr_reward,yolo_conf,yolo_ms,yolo_reward,yolo_top
+microscope/microscope_compound_microscope_school_lab_000001.jpg,0.5801,9262.4,1.0,True,None,0.9005,9,10897.2,0.9005,0.0000,677.9,0.0,None
+microscope/microscope_compound_microscope_school_lab_000002.jpg,0.7061,9509.5,1.0,True,airplane,0.9969,1,4449.0,0.9969,0.2669,1246.8,0.2669,airplane
+calculator/calculator_calculator_and_math_textbook_000001.jpg,0.942,10234.1,1.0,True,remote,0.8809,27,10630.9,0.8809,0.9145,437.0,0.9145,remote
+calculator/calculator_calculator_and_math_textbook_000002.jpg,0.7369,7839.7,1.0,True,book,0.8636,86,10382.8,0.8636,0.4104,577.0,0.4104,book
+backpack/backpack_school_backpack_on_desk_000001.jpg,0.667,7229.2,1.0,True,backpack,0.0000,0,1420.2,0.0,0.6674,524.1,0.6674,backpack
+backpack/backpack_school_backpack_on_desk_000003.jpg,0.5871,9177.3,1.0,True,chair,0.0000,0,833.8,0.0,0.4678,239.6,0.4678,chair
+periodic_table_poster/periodic_table_poster_chemistry_classroom_with_perio_000001.jpg,0.7249,6805.3,1.0,True,book,0.8887,7,366.1,0.8887,0.3680,431.7,0.368,book
+periodic_table_poster/periodic_table_poster_chemistry_classroom_with_perio_000002.jpg,0.5921,7023.6,1.0,True,None,0.9603,191,4380.4,0.9603,0.0000,197.0,0.0,None
+globe_model/globe_model_classroom_globe_on_teacher_des_000001.jpg,0.7491,7737.6,1.0,True,vase,0.0000,0,1411.5,0.0,0.8728,113.5,0.8728,vase
+globe_model/globe_model_classroom_globe_on_teacher_des_000002.jpg,0.6312,8870.1,1.0,True,dining table,0.0000,0,1408.7,0.0,0.5781,180.6,0.5781,dining table
+safety_goggles/safety_goggles_protective_lab_glasses_close_u_000001.jpg,0.5399,7779.3,1.0,True,None,0.6993,7,7564.3,0.6993,0.0000,383.9,0.0,None
+safety_goggles/safety_goggles_protective_lab_glasses_close_u_000002.jpg,0.51,7666.3,1.0,True,parking meter,0.0000,0,1156.8,0.0,0.2750,286.9,0.275,parking meter
