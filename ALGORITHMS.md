@@ -118,25 +118,51 @@ CQL/IQL when the logs grow.
 
 ## Data accounting
 
-Currently logged in-memory by [prototype/app.js → RT](prototype/app.js):
+Logged at runtime by [prototype/app.js → RT](prototype/app.js) and
+persisted to `localStorage` under the key `lens.runtime.v1`:
 
 - `RT.captures` — `(id, topic, subject, when, isGenerated)`. Identifies
   *which* topics got scanned and whether the served card was authored or
-  generated.
-- `RT.generatedCards` — `id → full card JSON`. The action taken.
-- `RT.quizSessions` — `(cardId, correct, total, at)`. The reward.
+  generated. Capped at 200 entries.
+- `RT.generatedCards` — `id → full card JSON`. The action taken. Capped at
+  200 entries (oldest dropped).
+- `RT.quizSessions` — `(cardIds[], correct, total, at)`. The reward.
+  Capped at 500 entries.
 
-Persistence is the *one* blocker between framing and training: today this
-is session-local. The Update-5 next-steps list already calls out
-`localStorage` or a small SQLite sidecar for this; we plan a 4-tuple
-schema:
+Persistence was the *one* blocker between framing and training. As of
+Update 6 it is **done**: the three RT collections survive page reloads,
+so trajectories accumulate across sessions instead of vanishing on
+refresh. A debounced `persistRT()` writes after each capture, generated
+card, and quiz finish; on page load `loadPersistedRT()` rehydrates.
 
-```jsonl
-{"t": "2026-05-13T22:11:04Z", "learner_id": "...", "state": {"topic": "copper-sulfate", "hint": "...", "box": null}, "action": {...card JSON...}, "reward": {"correct": 5, "total": 6, "answered_in_ms": 18342}}
+Writes are bounded to keep `localStorage` from growing unbounded. The
+versioned key prefix (`lens.runtime.v1`) lets us bump the schema later
+without resurrecting stale data.
+
+### Trajectory export
+
+A small console hook produces the JSONL trajectory format above directly
+from the browser:
+
+```js
+window.lensExportTrajectories()    // downloads lens-trajectories.jsonl
 ```
 
-JSONL is intentional: streaming-friendly and easy to convert to the
-trajectories format any of the algorithms above expect.
+Schema of each line, matching the format any of the algorithms above
+expect:
+
+```jsonl
+{"t": "2026-05-13T22:11:04Z", "state": {"topic": "copper-sulfate", "generated": true}, "action": {...card JSON...}, "reward": {"correct": 5, "total": 6}}
+```
+
+JSONL is intentional: streaming-friendly and trivially convertible to
+the trajectories format CQL / IQL / AWAC each expect. The JSONL stream
+plus the per-stage rewards from L3 (see [BENCHMARKS.md](BENCHMARKS.md))
+together give us the per-trajectory `(s, a_yolo, a_clip, a_ocr, a_llm,
+r_vector, r_joint)` tuples value-decomposition methods need. The
+per-card-per-quiz `answered_in_ms` field is left as future work — it
+needs per-card timing instrumentation in the quiz UI, not just the
+aggregate per-quiz timing currently logged.
 
 ## Per-agent rewards as the credit-assignment signal
 
