@@ -29,14 +29,15 @@ def get_device() -> str:
     return "cpu"
  
  
-def ensure_coco128(model: YOLO) -> Path:
+def ensure_coco128() -> Path:
     """
-    Download COCO128 if not already present by running a single dummy
-    prediction — Ultralytics handles the rest automatically.
+    Download COCO128 (~6 MB) if it isn't already cached, by calling
+    Ultralytics' ``check_det_dataset`` on the ``coco128.yaml`` manifest —
+    that helper resolves the dataset entry and triggers the download as a
+    side effect. Returns the path to the train2017 image folder.
     """
     if not COCO128_IMAGES.exists():
         print("  Downloading COCO128 dataset (~6 MB)...", flush=True)
-        # Triggering dataset download via Ultralytics val utility
         from ultralytics.data.utils import check_det_dataset
         check_det_dataset("coco128.yaml")
     return COCO128_IMAGES
@@ -68,7 +69,7 @@ def run_benchmark():
     model.to(device)
  
     # Ensure COCO128 is downloaded
-    images_dir = ensure_coco128(model)
+    images_dir = ensure_coco128()
     all_images = collect_images(images_dir)
  
     if not all_images:
@@ -92,10 +93,9 @@ def run_benchmark():
  
     # Also track per-detected-class stats for the top classes
     class_confs   = defaultdict(list)
-    class_times_per_image = []  # (ms, list_of_class_names_detected)
- 
+
     coco_names = model.names  # dict {int: str}
- 
+
     for img_path in all_images:
         t0 = time.perf_counter()
         results = model.predict(
@@ -106,27 +106,22 @@ def run_benchmark():
             verbose=False,
         )
         t1 = time.perf_counter()
- 
+
         elapsed_ms = (t1 - t0) * 1000
         all_times.append(elapsed_ms)
- 
+
         boxes = results[0].boxes
         if boxes is not None and len(boxes) > 0:
             confs       = boxes.conf.cpu().tolist()
             class_ids   = boxes.cls.cpu().tolist()
             all_confs.extend(confs)
             all_det_counts.append(len(boxes))
- 
-            detected_classes = []
+
             for cid, conf in zip(class_ids, confs):
                 cname = coco_names[int(cid)]
                 class_confs[cname].append(conf)
-                detected_classes.append(cname)
- 
-            class_times_per_image.append((elapsed_ms, detected_classes))
         else:
             all_det_counts.append(0)
-            class_times_per_image.append((elapsed_ms, []))
  
     # ── Overall stats ─────────────────────────────────────────────────────────
     overall_ms   = sum(all_times) / len(all_times)
@@ -190,7 +185,8 @@ def run_benchmark():
     print(f"  Real-time    : {rt_status}")
     print("=" * 62)
     print()
-    print("  Next step: pipe detection output into OCR + LLM (pipeline.py)")
+    print("  Next step: full pipeline benchmarks live in benchmarks/benchmark_pipeline.py")
+    print("             and OCR/pipeline_benchmark.py (see BENCHMARKS.md)")
     print()
  
  
