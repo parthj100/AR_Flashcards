@@ -69,12 +69,20 @@ DEFAULT_OUT_DIR    = "OCR/results"
 IMAGE_EXTS         = {".jpg", ".jpeg", ".png", ".webp"}
 
 CLIP_LABEL_MAP = {
+    # Update-4 classes
     "textbook":         ["book", "textbook"],
     "whiteboard":       ["whiteboard"],
     "desk_chair":       ["chair", "desk_chair"],
     "chemistry_flask":  ["beaker", "erlenmeyer", "test-tube", "chemistry_flask"],
     "laptop_computer":  ["laptop", "laptop_computer"],
     "ruler_pencil_pen": ["pencil", "ruler_pencil_pen"],
+    # Update-5 expansion classes (current dataset on disk)
+    "microscope":              ["microscope"],
+    "calculator":              ["calculator"],
+    "backpack":                ["backpack"],
+    "periodic_table_poster":   ["periodic table", "chemistry poster", "periodic_table_poster"],
+    "globe_model":             ["globe", "world globe", "globe_model"],
+    "safety_goggles":          ["safety goggles", "lab goggles", "safety_goggles"],
 }
 
 # ---------------------------------------------------------------------------

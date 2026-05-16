@@ -1,0 +1,4 @@
+mode,runs,avg_ms,p50_ms,p95_ms,fps,accuracy,realtime
+Single (CLIP),0,0,0,0,0,0,N/A
+Multi (YOLO+CLIP),0,0,0,0,0,0,N/A
+OCR (EasyOCR+Phi-3),5,7961.08,7198.99,11265.16,0.13,1.0,NO
