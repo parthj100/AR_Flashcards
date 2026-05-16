@@ -1,0 +1,52 @@
+# ── Model weights (auto-downloaded) ──────────────────────────
+*.pt
+*.pth
+*.onnx
+*.weights
+*.bin
+
+# ── Test images and results ───────────────────────────────────
+*.jpeg
+*.jpg
+*.png
+*.webp
+results/
+dataset/
+
+# ── Python cache ──────────────────────────────────────────────
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+
+# ── Virtual environments ──────────────────────────────────────
+venv/
+env/
+.env
+.venv
+
+# ── Jupyter Notebooks checkpoints ────────────────────────────
+.ipynb_checkpoints/
+*.ipynb
+
+# ── Anaconda / conda ──────────────────────────────────────────
+.conda/
+
+# ── macOS system files ────────────────────────────────────────
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# ── VS Code ───────────────────────────────────────────────────
+.vscode/
+*.code-workspace
+
+# ── Logs and outputs ──────────────────────────────────────────
+*.log
+*.csv
+runs/
+
+# ── PaddleOCR cache
+inference/
+.paddleocr/
