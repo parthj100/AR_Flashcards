@@ -149,23 +149,30 @@ for this stage*; we're saving it for Update 7.
 ## The benchmark hierarchy we actually report
 
 Because no single number works, the repo's measurements are split into
-three layers, and each layer is the right tool for a different
-question:
+four layers, and each layer is the right tool for a different question.
+Update 6 added the missing per-agent and reward-decomposition layers; see
+[BENCHMARKS.md](BENCHMARKS.md) for the full methodology and reproduction
+commands.
 
 | Layer | Question it answers | Where it lives |
 |---|---|---|
-| **Per-agent perception** | "How fast and how accurate is this single agent at its own metric?" | [YOLOv8-Detection/results/](YOLOv8-Detection/results/) — comparative latency/FPS/confidence across `yolov8n` / `yolov8s` / `yolov8m` |
-| **Composition quality** | "When two agents pass outputs to each other, where does the error budget go?" | Planned for Update 6: a routing-success metric (did the chosen box → CLIP → LLM chain land on the intended card?) |
-| **End-to-end task quality** | "Did this card help the learner learn?" | `RT.quizSessions` in [prototype/app.js](prototype/app.js) — the same logs we use as RL reward |
+| **L1 — per-agent perception** | "How fast and how accurate is this single agent at its own metric?" | [YOLOv8-Detection/compare_benchmarks.py](YOLOv8-Detection/compare_benchmarks.py), [OCR/benchmark.py](OCR/benchmark.py), [benchmarks/benchmark_llm.py](benchmarks/benchmark_llm.py) — latency/FPS/confidence/schema-validity per agent |
+| **L2 — end-to-end latency** | "How long does the full pipeline take per scan?" | [benchmarks/benchmark_pipeline.py](benchmarks/benchmark_pipeline.py) — sums per-agent wall-clock in pipeline order |
+| **L3 — reward decomposition** | "What is each agent contributing to the joint outcome?" | [benchmarks/benchmark_rewards.py](benchmarks/benchmark_rewards.py) — `rewards.txt`-style per-agent + joint reward (Tier 1 today; Tier 2 with labels) |
+| **L4 — task quality** | "Did this card help the learner learn?" | `RT.quizSessions` in [prototype/app.js](prototype/app.js) — same logs we use as RL reward; persistence on the Update-6 backlog |
 
-The Update-5 benchmark covers Layer 1 only, on the YOLO agent. Layer 2
-needs the OCR integration plus a small labeled routing set. Layer 3 needs
-the persistence work called out in the algorithmic-framing doc — the
-quiz logs already accumulate, they just don't survive a page reload.
+L1 was extended in Update 6 from YOLO-only to all four sidecar agents.
+L2 and L3 are new; together they're the direct response to *"we benchmark
+YOLO, not the pipeline"* and *"can we use a reward decomposition like
+the layout/style/budget team did."* L4 needs the persistence work called
+out in [ALGORITHMS.md](ALGORITHMS.md) — the quiz logs already accumulate,
+they just don't survive a page reload yet.
 
-This three-layer view is *the* answer to "why is benchmarking hard?":
-you can hit Layer 1 with standard CV tooling, but Layers 2 and 3 require
-infrastructure the prototype is still building.
+This four-layer view is *the* answer to "why is benchmarking hard?":
+you can hit L1 with standard CV tooling, L2 with HTTP plumbing, L3
+becomes informative only once you decide on a reward function (and the
+Tier-1 → Tier-2 transition shows why the choice matters), and L4
+requires infrastructure the prototype is still building.
 
 ## Concrete metrics, per agent
 
@@ -182,6 +189,27 @@ once each is fully wired:
 
 Numbers in italics are planned; numbers in roman are reportable from
 the current repo state.
+
+## What the L3 reward decomposition looks like in practice
+
+The first run of [benchmark_rewards.py](benchmarks/benchmark_rewards.py)
+on 12 images (all four agents live, Tier 1 confidences as rewards):
+
+| agent | n | mean reward |
+|---|---:|---:|
+| yolo | 12 | 0.4017 |
+| ocr  | 12 | 0.5159 |
+| llm  | 12 | 1.0000 |
+| **joint** | 12 | **0.6639** |
+
+The LLM scoring 1.0 is *the* useful illustration of why Tier 1 is just
+a starting point: every generated card was schema-valid, but several
+were generated for nonsense topics like `parking meter` (a goggles
+image YOLO labeled as parking meter, then CLIP would have re-routed in
+the live UI but doesn't in this benchmark path). Tier 2 will replace
+the schema-validity signal with a tone-cosine and factuality check
+against authored expert cards, which will discriminate between "valid
+JSON for the right card" and "valid JSON for nonsense."
 
 ## Open question for the reviewer
 

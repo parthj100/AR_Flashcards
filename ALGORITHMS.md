@@ -138,6 +138,49 @@ schema:
 JSONL is intentional: streaming-friendly and easy to convert to the
 trajectories format any of the algorithms above expect.
 
+## Per-agent rewards as the credit-assignment signal
+
+The L4 quiz reward is sparse and joint — one number per learner-card
+interaction. Sparse joint rewards are the worst case for offline RL on a
+sequential pipeline because every agent's update has to be inferred from
+a single end-of-trajectory scalar.
+
+The L3 reward decomposition added in Update 6 (see [BENCHMARKS.md](BENCHMARKS.md)
+and [benchmark_rewards.py](benchmarks/benchmark_rewards.py)) gives us a
+*vector* reward per scan instead:
+
+```
+r(s, a) = (r_yolo, r_ocr, r_llm, r_joint)
+```
+
+This is the same idea another team used for their layout/style/budget
+multi-agent benchmark — credit each agent against its own contribution
+rather than only against the joint outcome. Two practical consequences
+for our offline-RL plans:
+
+1. **Cleaner credit assignment for AWAC.** The advantage estimate
+   `A(s, a) = r − V(s)` becomes per-agent: the LLM's update no longer
+   gets penalized when YOLO mislocalized the subject, because YOLO's
+   reward dropped first. This is essentially a value-decomposition
+   network (VDN) baseline — the joint critic is the sum of per-agent
+   critics, regularizing toward attribution that the per-agent rewards
+   already make explicit.
+2. **Bridge from Tier 1 to Tier 2.** Tier 1 uses self-reported
+   confidences as proxy rewards; Tier 2 (with labeled data) uses
+   accuracy. The offline-RL pipeline doesn't change between tiers — only
+   the reward function does. So we can prototype the algorithmic loop on
+   Tier-1 rewards now, and swap in Tier-2 rewards later without
+   re-instrumenting the data path.
+
+There is a known risk: per-agent rewards can mis-shape the policy if
+they are not aligned with the joint outcome. A YOLO box with very high
+self-confidence and the wrong content gets rewarded under Tier 1; a
+schema-valid card for the wrong topic gets `r_llm = 1.0`. We treat the
+per-agent rewards as *auxiliary* signals — used for variance reduction
+in the offline updates, not as the only objective. The joint reward
+(quiz outcome) remains the only thing the BC + offline-RL pipeline
+ultimately optimizes for.
+
 ## What a minimum-viable result would look like
 
 The reviewer noted no result is required yet. For Update 6 we plan two:
@@ -147,7 +190,8 @@ The reviewer noted no result is required yet. For Update 6 we plan two:
    under `FLASHCARD_SCHEMA`), tone-match (cosine vs author embeddings),
    and a tiny human-graded factuality check on a sample.
 2. **AWAC on the BC policy using the logged (s, a, r) triples** once we
-   have ~500+ rewarded generations. Metric: off-policy estimator (WIS or
+   have ~500+ rewarded generations, with the L3 reward decomposition as
+   the per-stage advantage signal. Metric: off-policy estimator (WIS or
    doubly-robust) on a frozen evaluation log.
 
 Both fit a couple of Colab GPU-hours and stay inside the project's
@@ -164,3 +208,9 @@ Both fit a couple of Colab GPU-hours and stay inside the project's
 - Nair, A., et al. (2020). *AWAC: Accelerating Online Reinforcement
   Learning with Offline Datasets*. arXiv:2006.09359.
 - Rafailov, R., et al. (2023). *Direct Preference Optimization*. NeurIPS.
+- Sunehag, P., et al. (2017). *Value-Decomposition Networks for
+  Cooperative Multi-Agent Learning*. arXiv:1706.05296. (motivation for
+  treating the joint critic as the sum of per-agent critics)
+- Foerster, J., et al. (2018). *Counterfactual Multi-Agent Policy
+  Gradients*. AAAI. (alternative credit-assignment story for sequential
+  pipelines)
