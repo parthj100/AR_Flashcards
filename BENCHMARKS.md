@@ -18,9 +18,10 @@ We measure four distinct things, each with its own script:
 | Level | What it answers | Script | Output |
 |---|---|---|---|
 | L1 — per-agent perception | "How fast and how accurate is each agent in isolation?" | `YOLOv8-Detection/compare_benchmarks.py`<br>`OCR/benchmark.py`<br>`benchmarks/benchmark_llm.py` | timestamped CSV / MD / JSON in `benchmarks/results/` |
-| L2 — end-to-end latency | "How long does the full pipeline take per scan?" | `benchmarks/benchmark_pipeline.py` | `pipeline_<ts>.{csv,md,_summary.csv}` |
+| L2 — end-to-end latency | "How long does the full pipeline take per scan?" | `benchmarks/benchmark_pipeline.py` (modular)<br>`OCR/pipeline_benchmark.py` (per-mode w/ accuracy) | `pipeline_<ts>.*` and `e2e_<ts>.*` |
 | L3 — reward decomposition | "What is each agent contributing to the joint outcome?" | `benchmarks/benchmark_rewards.py` | `rewards_<ts>.{txt,md,csv}` |
 | L4 — task quality | "Did the cards we generated actually help learners?" | `RT.quizSessions` in `prototype/app.js` (logged in-session) | not yet aggregated; persistence on the Update-6 backlog |
+| Visualizations | "What did the agent actually do on this image?" | `OCR/visualize_pipeline.py`<br>`YOLOv8-Detection/visualize_yolo.py` | annotated PNGs (heatmap, YOLO boxes) |
 
 L1 was where Update 5 lived; L2–L3 are new; L4 is the open work that
 [ALGORITHMS.md](ALGORITHMS.md) frames as the offline-RL reward.
@@ -98,6 +99,10 @@ parses as JSON with all required fields and exactly four facts.
 
 ### L2 — end-to-end pipeline
 
+Two complementary scripts here, each answering a different question:
+
+#### `benchmarks/benchmark_pipeline.py` — modular per-agent latency
+
 ```
 YOLOv8-Detection/.venv/bin/python benchmarks/benchmark_pipeline.py --limit 30
 ```
@@ -105,7 +110,8 @@ YOLOv8-Detection/.venv/bin/python benchmarks/benchmark_pipeline.py --limit 30
 Walks a folder of images, runs YOLO → OCR → LLM in sequence per image,
 records per-agent and end-to-end wall-clock latencies. Each agent can be
 skipped (`--skip-yolo`, `--skip-ocr`, `--skip-llm`) so the script gives
-useful output even when only one or two sidecars are running.
+useful output even when only one or two sidecars are running. Built on
+the shared [agents.py](benchmarks/agents.py) HTTP helper.
 
 Important caveat baked into the output: **the e2e latency reported is
 the *sum* of per-agent latencies in pipeline order**. The live prototype
@@ -113,6 +119,24 @@ runs CLIP and YOLO partly in parallel and starts the LLM as soon as the
 topic is decided, so the sum is an upper bound, not a measured wall
 clock for the UI. Reporting the upper bound is honest for a benchmark
 suite — it's what you'd see if every stage were strictly sequential.
+
+#### `OCR/pipeline_benchmark.py` — three-mode benchmark with accuracy
+
+```
+YOLOv8-Detection/.venv/bin/python OCR/pipeline_benchmark.py
+```
+
+Benchmarks the **three actual prototype modes** (Single = CLIP-only,
+Multi = YOLO + CLIP, OCR = EasyOCR + Phi-3) end-to-end, with **accuracy
+metrics** against ground-truth class labels. Important: this is the only
+script that runs CLIP from Python (via `transformers` and the
+ViT-B/32 checkpoint) — useful because CLIP otherwise lives only in the
+browser. Outputs `e2e_<ts>_agents.csv`, `e2e_<ts>_pipeline.csv`, and a
+markdown summary with the four standardized metrics
+(latency, accuracy, throughput, confidence) per agent and per mode.
+
+Use the modular script for quick latency checks; use the per-mode
+script when you need accuracy numbers and CLIP coverage.
 
 ### L3 — per-agent reward decomposition
 
@@ -169,6 +193,31 @@ Same script, different reward functions. The plan is to label ~30
 images (one per topic) and swap in `--labels benchmarks/labels.json` to
 get Tier-2 numbers for the paper.
 
+#### Two image cohorts already produce useful Tier-1 numbers
+
+The same script gives strikingly different per-agent decompositions
+depending on which cohort it runs against, which is itself an
+illustration of why the per-agent decomposition matters:
+
+| Cohort | YOLO_R | OCR_R | LLM_R | Joint |
+|---|---:|---:|---:|---:|
+| Update-5 school objects (12 images, `dataset/images/raw/`) | 0.40 | 0.52 | 1.00 | 0.66 |
+| Text problems (5 images, `OCR/test_images/`) | 0.10 | 0.89 | 1.00 | 0.62 |
+
+The joint scores are nearly identical. The contributions are not.
+School-object scans depend on YOLO; text-bearing scans depend on OCR.
+A single joint number would have hidden this — the decomposition makes
+the *which agent did the work* visible. Run the second cohort with:
+
+```
+python benchmarks/benchmark_rewards.py --images-dir OCR/test_images --flat --limit 5
+```
+
+The `--flat` flag treats `--images-dir` as a flat folder of images
+rather than `<class>/...` subdirectories, with each file's stem used as
+its label. Convenient for small labelled-by-filename sets like
+`OCR/test_images`.
+
 ## Mapping to the project title
 
 | Title phrase | Where the suite covers it |
@@ -197,11 +246,32 @@ YOLOv8-Detection/.venv/bin/python benchmarks/benchmark_pipeline.py --limit 30
 
 # 4. L3 reward decomposition (mirror of the other team's rewards.txt)
 YOLOv8-Detection/.venv/bin/python benchmarks/benchmark_rewards.py --limit 20
+
+# 5. Per-mode pipeline benchmark (Single / Multi / OCR modes, with accuracy)
+YOLOv8-Detection/.venv/bin/python OCR/pipeline_benchmark.py
+
+# 6. Visualizations
+YOLOv8-Detection/.venv/bin/python OCR/visualize_pipeline.py
+YOLOv8-Detection/.venv/bin/python YOLOv8-Detection/visualize_yolo.py
 ```
 
 Outputs land in `benchmarks/results/` (and `YOLOv8-Detection/results/`
-for the YOLO numbers). Every file is timestamped so successive runs
-accumulate.
+for the YOLO numbers, `OCR/results/` for `pipeline_benchmark.py`).
+Every file is timestamped so successive runs accumulate.
+
+## Image cohorts
+
+Two image sets live in the repo and are used by different benchmarks:
+
+| Cohort | Path | Size | What it's for |
+|---|---|---:|---|
+| School-objects detection | [YOLOv8-Detection/dataset/images/raw/](YOLOv8-Detection/dataset/images/raw/) | 554 | YOLO + recognition benchmarks; objects with limited text |
+| OCR test images | [OCR/test_images/](OCR/test_images/) | 5 | OCR + LLM benchmarks; whiteboards / problem sets that are mostly text |
+
+The two cohorts produce nearly-identical *joint* reward but very
+different *per-agent* contributions (school objects exercise YOLO,
+text problems exercise OCR), so running both is the cheap way to
+sanity-check that the reward decomposition is doing useful work.
 
 ## See also
 

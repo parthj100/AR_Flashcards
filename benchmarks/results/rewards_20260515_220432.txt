@@ -1,0 +1,33 @@
+Multi-Agent Pipeline Rewards (AR Flashcard Tutor)
+================================================================
+
+Images processed:   5
+Wall clock:         51.69 s
+Mean per-image:     10338 ms
+Reward weights:     yolo=0.4  ocr=0.2  llm=0.4
+Tier:               1 (self-reported confidence + schema validity; no labels)
+
+Agent Trajectory:
+  [yolo_agent]    img=algebra_problem/algebra_problem.jpg  top=None            conf=0.000  n_det=0  | 154.1 ms
+  [ocr_agent]     img=algebra_problem/algebra_problem.jpg  lines=10   mean_conf=0.878            | 750 ms
+  [llm_agent]     topic=None                    schema=✓  tokens=420  tps=57.0 | 11141 ms
+  [yolo_agent]    img=chemistry_problem/chemistry_problem.png  top=None            conf=0.000  n_det=0  | 155.4 ms
+  [ocr_agent]     img=chemistry_problem/chemistry_problem.png  lines=9    mean_conf=0.851            | 1941 ms
+  [llm_agent]     topic=None                    schema=✓  tokens=311  tps=56.8 | 6431 ms
+  [yolo_agent]    img=derivative/derivative.jpeg  top=None            conf=0.000  n_det=0  | 206.1 ms
+  [ocr_agent]     img=derivative/derivative.jpeg  lines=2    mean_conf=0.996            | 378 ms
+  [llm_agent]     topic=None                    schema=✓  tokens=342  tps=56.6 | 7092 ms
+  [yolo_agent]    img=physics_problem/physics_problem.png  top=None            conf=0.000  n_det=0  | 536.7 ms
+  [ocr_agent]     img=physics_problem/physics_problem.png  lines=47   mean_conf=0.842            | 3452 ms
+  [llm_agent]     topic=None                    schema=✓  tokens=364  tps=56.4 | 7638 ms
+  [yolo_agent]    img=whiteboard/whiteboard.jpg  top=bird            conf=0.500  n_det=2  | 221.3 ms
+  [ocr_agent]     img=whiteboard/whiteboard.jpg  lines=3    mean_conf=0.870            | 3069 ms
+  [llm_agent]     topic=bird                    schema=✓  tokens=430  tps=60.1 | 8518 ms
+
+YOLO Reward (mean):    0.0999   (n=5)
+OCR Reward  (mean):    0.8873   (n=5)
+LLM Reward  (mean):    1.0000   (n=5, schema-valid rate 100.00%)
+Joint Reward (mean):   0.6174   (n=5)
+
+Total Spend:           $0.00 (all-local inference, no cloud calls)
+Schema-validity rate:  100.0%

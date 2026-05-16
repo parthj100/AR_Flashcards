@@ -1,0 +1,6 @@
+image,joint_reward,llm_ms,llm_reward,llm_schema_valid,llm_topic,ocr_conf,ocr_lines,ocr_ms,ocr_reward,yolo_conf,yolo_ms,yolo_reward,yolo_top
+algebra_problem/algebra_problem.jpg,0.5755,11141.0,1.0,True,None,0.8775,10,750.2,0.8775,0.0000,154.1,0.0,None
+chemistry_problem/chemistry_problem.png,0.5703,6430.9,1.0,True,None,0.8514,9,1941.4,0.8514,0.0000,155.4,0.0,None
+derivative/derivative.jpeg,0.5992,7092.2,1.0,True,None,0.9961,2,377.7,0.9961,0.0000,206.1,0.0,None
+physics_problem/physics_problem.png,0.5683,7637.6,1.0,True,None,0.8417,47,3452.1,0.8417,0.0000,536.7,0.0,None
+whiteboard/whiteboard.jpg,0.7738,8517.9,1.0,True,bird,0.8698,3,3069.3,0.8698,0.4996,221.3,0.4996,bird
