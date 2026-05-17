@@ -1,7 +1,8 @@
-# Editor / OS
+# Editor / OS / tool config
 .DS_Store
 .vscode/
 .idea/
+.claude/
 
 # Python
 __pycache__/

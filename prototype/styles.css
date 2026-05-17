@@ -302,19 +302,28 @@ kbd {
   background: rgba(255,255,255,.92); color: var(--ink);
   padding: 4px 8px; border-radius: 6px; text-transform: uppercase;
 }
+/* Layered "Pantone card" mark: front square centered, larger back square
+   peeking from behind. Both stay inside the cover; nothing bleeds. */
 .scan-cover .blob {
-  width: 60%; height: 60%;
-  background: rgba(255,255,255,.18);
-  border-radius: 18%;
+  width: 48%;
+  aspect-ratio: 1;
+  background: rgba(255,255,255,.24);
+  border-radius: 22%;
+  transform: rotate(-4deg);
   position: relative;
-  transform: rotate(-8deg);
+  z-index: 1;
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,.10);
 }
 .scan-cover .blob::after {
-  content: ''; position: absolute;
-  width: 55%; height: 55%; right: -25%; bottom: -18%;
-  background: rgba(255,255,255,.22);
-  border-radius: 18%;
-  transform: rotate(14deg);
+  content: '';
+  position: absolute;
+  inset: 50% auto auto 50%;
+  width: 122%;
+  aspect-ratio: 1;
+  background: rgba(255,255,255,.11);
+  border-radius: 22%;
+  transform: translate(-50%, -50%) rotate(7deg);
+  z-index: -1;
 }
 .scan-meta { padding: 12px 4px 0; }
 .scan-title { font-family: var(--font-display); font-size: 22px; line-height: 1.05; }
@@ -393,18 +402,25 @@ kbd {
   border-bottom: 1px solid var(--border);
 }
 .deck-cover .blob {
-  width: 55%; height: 55%;
-  background: rgba(255,255,255,.18);
-  border-radius: 18%;
-  transform: rotate(-8deg);
+  width: 44%;
+  aspect-ratio: 1;
+  background: rgba(255,255,255,.24);
+  border-radius: 22%;
+  transform: rotate(-4deg);
   position: relative;
+  z-index: 1;
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,.10);
 }
 .deck-cover .blob::after {
-  content: ''; position: absolute;
-  width: 55%; height: 55%; right: -25%; bottom: -18%;
-  background: rgba(255,255,255,.22);
-  border-radius: 18%;
-  transform: rotate(14deg);
+  content: '';
+  position: absolute;
+  inset: 50% auto auto 50%;
+  width: 122%;
+  aspect-ratio: 1;
+  background: rgba(255,255,255,.11);
+  border-radius: 22%;
+  transform: translate(-50%, -50%) rotate(7deg);
+  z-index: -1;
 }
 .deck-cover .tag-pill {
   position: absolute; top: 14px; right: 14px;
@@ -456,18 +472,25 @@ kbd {
   display: flex; align-items: center; justify-content: center;
 }
 .card-cover .blob {
-  width: 56%; height: 56%;
-  background: rgba(255,255,255,.22);
-  border-radius: 18%;
-  transform: rotate(-8deg);
+  width: 46%;
+  aspect-ratio: 1;
+  background: rgba(255,255,255,.28);
+  border-radius: 22%;
+  transform: rotate(-4deg);
   position: relative;
+  z-index: 1;
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,.10);
 }
 .card-cover .blob::after {
-  content: ''; position: absolute;
-  width: 55%; height: 55%; right: -22%; bottom: -16%;
-  background: rgba(255,255,255,.28);
-  border-radius: 18%;
-  transform: rotate(14deg);
+  content: '';
+  position: absolute;
+  inset: 50% auto auto 50%;
+  width: 122%;
+  aspect-ratio: 1;
+  background: rgba(255,255,255,.14);
+  border-radius: 22%;
+  transform: translate(-50%, -50%) rotate(7deg);
+  z-index: -1;
 }
 .card-cover .scan-tag {
   position: absolute; top: 14px; left: 14px;
