@@ -11,7 +11,7 @@
 // flashcard content on the fly at capture time.
 
 window.LENS_DATA = {
-  user: { name: 'Parth Joshi', initials: 'PJ', plan: 'Free plan · 7-day streak' },
+  user: { name: 'Lens user', initials: 'LN', plan: 'Local prototype · all data stays on device' },
 
   myDecks: [
     { id: 'biology-cell', name: 'Biology · cell unit', count: 24, dot: '#4a7fc6' },
