@@ -1,129 +1,193 @@
 # AR Flashcard Tutor
 
-An AI-powered augmented reality application that scans physical objects or printed flashcards through a device camera and generates real-time educational overlays — including explanations, quiz questions, and visual annotations.
+Camera-driven study app. Point a phone or laptop camera at a real object
+or a printed flashcard; a multi-agent pipeline recognises the subject,
+generates a study card on the fly, and lets you quiz yourself on it.
 
-Built as part of a research project on **Standardized Benchmarking of Multi-Agent Distributed Machine Learning in Augmented Reality**.
-
----
-
-## Project Scope
-
-The AR Flashcard Tutor explores whether a multi-agent, edge-distributed AR pipeline can deliver accurate, context-aware educational overlays in real time on commodity hardware. The system follows a four-stage pipeline:
-
-1. **Object Detection** — Identify and localize objects or flashcards in the camera feed
-2. **OCR Text Extraction** — Read printed text from detected flashcard regions
-3. **LLM Explanation + Quiz Generation** — Generate a concise explanation and a multiple-choice question based on the detected content
-4. **Visual Annotation & AR Overlay** — Render bounding boxes, labels, explanations, and quiz panels directly on the live camera feed
+Built as a research project on **Standardized Benchmarking of
+Multi-Agent Distributed Machine Learning in Augmented Reality**. The
+benchmarking story is the academic contribution — the prototype is the
+artifact we benchmark against.
 
 ---
 
-## Tech Stack
+## What's in this repo
 
-### Models
-
-| Component | Model | Source |
-|---|---|---|
-| Object Detection | YOLOv8-Nano | [Ultralytics GitHub](https://github.com/ultralytics/ultralytics) (Apache 2.0) |
-| OCR | PaddleOCR | [PaddlePaddle GitHub](https://github.com/PaddlePaddle/PaddleOCR) (Apache 2.0) |
-| Explanation + Quiz Generation | Phi-3-mini (on-device) / GPT-4.1-mini (cloud fallback) | [HuggingFace](https://huggingface.co/microsoft/Phi-3-mini-4k-instruct) / [OpenAI API](https://platform.openai.com/) |
-| Visual Annotation | SAM 2 (Segment Anything Model 2) | [Meta AI GitHub](https://github.com/facebookresearch/segment-anything-2) (Apache 2.0) |
-
-### Datasets
-
-| Dataset | Purpose | Source |
-|---|---|---|
-| ImageNet (ILSVRC) | Object recognition pre-training | [image-net.org](https://image-net.org/) |
-| COCO | Object detection & segmentation | [cocodataset.org](https://cocodataset.org/) |
-| Open Images V7 | Extended detection with visual relationships | [GitHub](https://github.com/openimages) |
-| SQuAD 2.0 / TriviaQA | Quiz generation fine-tuning | [HuggingFace](https://huggingface.co/datasets/rajpurkar/squad_v2) |
-| Custom Flashcard Dataset | Domain-specific card recognition | Self-collected, annotated via [Roboflow](https://roboflow.com/) |
-
-### Frontend & Platform
-
-- **Web-based UI** — HTML, CSS, JavaScript
-- **TensorFlow.js** — In-browser model inference (COCO-SSD for prototyping)
-- **WebXR** — AR camera access and overlay rendering
-- **Canvas API / OpenCV.js** — Bounding box and annotation drawing
-
-### Dev Tools
-
-- **Google Colab** — Model training and fine-tuning (free GPU)
-- **Roboflow** — Dataset annotation and management
-- **Python** — Backend pipeline prototyping and model evaluation
+| Path | What it is |
+|---|---|
+| [`prototype/`](prototype/) | Vanilla-JS web prototype (Lens UI). Hash-routed dashboard / decks / scan / flashcard views. Loads CLIP in the browser via Transformers.js; talks to the YOLO and OCR sidecars over HTTP. |
+| [`YOLOv8-Detection/`](YOLOv8-Detection/) | YOLO detection agent — FastAPI sidecar ([`serve.py`](YOLOv8-Detection/serve.py)), single-image CLI ([`detect.py`](YOLOv8-Detection/detect.py)), comparative benchmark ([`compare_benchmarks.py`](YOLOv8-Detection/compare_benchmarks.py)), dataset collector ([`collect_dataset.py`](YOLOv8-Detection/collect_dataset.py)). |
+| [`OCR/`](OCR/) | OCR agent — FastAPI sidecar ([`ocr_serve.py`](OCR/ocr_serve.py)) on EasyOCR, per-mode pipeline benchmark ([`pipeline_benchmark.py`](OCR/pipeline_benchmark.py)) with accuracy metrics, visualisation scripts. |
+| [`benchmarks/`](benchmarks/) | Cross-pipeline benchmarks — LLM ([`benchmark_llm.py`](benchmarks/benchmark_llm.py)), end-to-end ([`benchmark_pipeline.py`](benchmarks/benchmark_pipeline.py)), per-agent reward decomposition ([`benchmark_rewards.py`](benchmarks/benchmark_rewards.py)), Tier-2 labels scaffolding, figures generator. |
+| [`Research Updates/`](Research%20Updates/) | Per-milestone PDFs (Updates 1–5). |
+| [`AGENTS.md`](AGENTS.md), [`ALGORITHMS.md`](ALGORITHMS.md), [`BENCHMARKS.md`](BENCHMARKS.md), [`CARDS.md`](CARDS.md), [`DATASET.md`](YOLOv8-Detection/DATASET.md) | Methodology docs the paper draws from. |
 
 ---
 
-## Pipeline Architecture
+## The pipeline (four agents)
 
 ```
-Camera Frame
-    │
-    ▼
-┌──────────────┐
-│  YOLOv8-Nano │  ──→  Detected class label + bounding box
-└──────┬───────┘
-       │
-       ▼
-┌──────────────┐
-│  PaddleOCR   │  ──→  Extracted text from flashcard
-└──────┬───────┘
-       │
-       ▼
-┌──────────────────────┐
-│  Phi-3-mini / GPT-4.1│  ──→  Explanation (2-3 sentences) + Quiz (MCQ in JSON)
-└──────┬───────────────┘
-       │
-       ▼
-┌──────────────┐
-│  SAM 2 + UI  │  ──→  Segmentation mask + overlay (labels, explanation card, quiz panel)
-└──────────────┘
+                        Camera frame
+                              │
+        ┌─────────────────────┼─────────────────────┐
+        ▼                     ▼                     ▼
+  ┌────────────┐       ┌────────────┐         ┌────────────┐
+  │  YOLOv8n   │       │   CLIP     │         │  EasyOCR   │
+  │ (FastAPI   │       │ (in-browser│         │  (FastAPI  │
+  │  :8765)    │       │  via tfjs) │         │   :8766)   │
+  └─────┬──────┘       └─────┬──────┘         └─────┬──────┘
+        │ box +              │ top-1 topic          │ text + box
+        │ COCO label         │ over Lens vocab      │
+        └─────────────┬──────┴──────────────────────┘
+                      ▼
+              ┌───────────────┐
+              │  Phi-3-mini   │
+              │   (Ollama     │
+              │   :11434)     │
+              └───────┬───────┘
+                      │ flashcard JSON
+                      ▼
+              ┌───────────────┐
+              │  Lens UI      │   render card, quiz,
+              │  (prototype/) │   persist to localStorage
+              └───────────────┘
 ```
+
+The three scan modes the prototype exposes (`Single` = CLIP only,
+`Multi` = YOLO + CLIP, `OCR` = EasyOCR + LLM) traverse different paths
+through this graph. See [`AGENTS.md`](AGENTS.md) for what each agent's
+observation, action space, and reward are.
 
 ---
 
-## Project Structure
+## Tech stack — what's actually running
 
-```
-ar-flashcard-tutor/
-├── README.md
-├── data/                  # Datasets and custom flashcard images
-├── models/                # Model weights and configs
-├── notebooks/             # Colab notebooks for training and evaluation
-├── src/                   # Source code
-│   ├── detection/         # YOLOv8 detection pipeline
-│   ├── ocr/               # PaddleOCR integration
-│   ├── llm/               # LLM prompt templates and API calls
-│   ├── overlay/           # AR overlay and annotation rendering
-│   └── ui/                # Frontend HTML/CSS/JS
-├── results/               # Benchmark tables, accuracy logs, screenshots
-└── docs/                  # Research updates and final report
-```
+| Layer | Implementation |
+|---|---|
+| Detection | **YOLOv8-Nano** via Ultralytics, MPS / CUDA / CPU autodetect |
+| Recognition | **CLIP ViT-B/32** in-browser via `@xenova/transformers` (Transformers.js) |
+| OCR | **EasyOCR** (English) running on CPU as a FastAPI sidecar |
+| LLM | **Phi-3-mini** via Ollama, JSON-mode generation pinned to a strict schema (see [`prototype/lib/llm.js`](prototype/lib/llm.js)) |
+| Frontend | Vanilla HTML / CSS / JS, hash-routed SPA, no build step |
+| Benchmark / training tooling | Python 3.13, the venv at `YOLOv8-Detection/.venv/` |
+
+Cloud fallback (GPT-4.1-mini) and SAM 2 segmentation are spec'd in
+[`AGENTS.md`](AGENTS.md) but not currently wired.
 
 ---
 
-## Getting Started
+## Datasets
+
+Two image sets live in the repo; see [`DATASET.md`](YOLOv8-Detection/DATASET.md)
+and [`CARDS.md`](CARDS.md) for full specs.
+
+| Set | Size | Source | Used for |
+|---|---:|---|---|
+| School-objects detection set | 554 images / 6 classes | Self-collected via [`collect_dataset.py`](YOLOv8-Detection/collect_dataset.py) (Bing + MD5 dedupe), annotated in Roboflow | YOLO + recognition benchmarks |
+| OCR test images | 5 | Hand-picked text-heavy images (algebra, chemistry, physics, whiteboard, derivative) | OCR + LLM benchmarks |
+| Authored flashcards | ~30 | Hand-written in [`prototype/data.js`](prototype/data.js) | Expert demonstrations for the IL / offline-RL framing in [`ALGORITHMS.md`](ALGORITHMS.md) |
+| Extended CLIP vocab | ~140 topics | Hand-written prompts in [`prototype/data.js`](prototype/data.js) | What CLIP can recognise out of the box |
+
+COCO is also used indirectly because YOLO ships pretrained on it.
+
+---
+
+## Benchmarks — what we measure
+
+Four layers, all scripts auto-pick the latest CSV in `benchmarks/results/`:
+
+| Layer | Question | Script | Latest result |
+|---|---|---|---|
+| L1 per-agent perception | "How fast / how accurate in isolation?" | `compare_benchmarks.py`, `OCR/benchmark.py`, `benchmarks/benchmark_llm.py` | n=554, all four agents covered |
+| L2 end-to-end latency | "How long does the full pipeline take per scan?" | `benchmarks/benchmark_pipeline.py`, `OCR/pipeline_benchmark.py` | YOLO 54 ms · CLIP 78 ms · OCR 667 ms · LLM 4872 ms |
+| L3 reward decomposition | "What is each agent contributing to the joint outcome?" | `benchmarks/benchmark_rewards.py` | n=554, Tier-1 joint reward **0.7234** |
+| L4 task quality | "Did the cards help the learner learn?" | `RT.quizSessions` persisted from the prototype | data starts accumulating as soon as you do a quiz |
+
+Eight paper-ready figures are committed at
+[`benchmarks/figures/`](benchmarks/figures/); regenerate via
+`python benchmarks/make_figures.py`.
+
+Full methodology + reproduction commands in
+[`BENCHMARKS.md`](BENCHMARKS.md).
+
+---
+
+## Getting started
 
 ### Prerequisites
 
-- Python 3.10+
-- Node.js (for TensorFlow.js dev server)
-- Google Colab account (for training)
-- OpenAI API key (for GPT-4.1-mini cloud fallback)
+- Python 3.10+ (3.13 known good)
+- [Ollama](https://ollama.com/) installed, with `phi3:mini` pulled:
+  ```bash
+  ollama pull phi3:mini
+  ```
+- A browser with camera permissions (Chrome / Edge recommended)
 
-### Quick Start
+### Set up the venv
 
 ```bash
-# Clone the repo
-git clone https://github.com/<your-username>/ar-flashcard-tutor.git
-cd ar-flashcard-tutor
-
-# Install Python dependencies
-pip install ultralytics paddleocr opencv-python
-
-# Run the web UI locally
-cd src/ui
-# Open ar_flashcard_detector.html in Chrome
+cd YOLOv8-Detection
+python3 -m venv .venv
+.venv/bin/pip install -r requirements.txt
+.venv/bin/pip install easyocr fastapi uvicorn pillow transformers
+cd ..
 ```
+
+The first run downloads YOLOv8n weights (~6 MB), the EasyOCR detection
++ recognition models (~64 MB), and CLIP-ViT-B/32 (~340 MB) on first use.
+
+### Bring up the four sidecars
+
+Each in its own terminal:
+
+```bash
+# 1. LLM
+ollama serve
+
+# 2. YOLO detection
+YOLOv8-Detection/.venv/bin/python YOLOv8-Detection/serve.py     # :8765
+
+# 3. OCR
+YOLOv8-Detection/.venv/bin/python OCR/ocr_serve.py              # :8766
+
+# 4. Static web server for the prototype
+python3 -m http.server 5500 --directory prototype
+```
+
+Open [http://localhost:5500](http://localhost:5500) and click *New scan*.
+The dashboard, decks page, and quiz flow all read from real data — see
+the live-UI section below.
+
+### Run a benchmark
+
+```bash
+# Per-agent perception (all four)
+YOLOv8-Detection/.venv/bin/python YOLOv8-Detection/compare_benchmarks.py
+YOLOv8-Detection/.venv/bin/python OCR/benchmark.py
+YOLOv8-Detection/.venv/bin/python benchmarks/benchmark_llm.py
+
+# End-to-end + reward decomposition
+YOLOv8-Detection/.venv/bin/python benchmarks/benchmark_pipeline.py --limit 30
+YOLOv8-Detection/.venv/bin/python benchmarks/benchmark_rewards.py --limit 20
+
+# Regenerate the eight paper figures
+YOLOv8-Detection/.venv/bin/python benchmarks/make_figures.py
+```
+
+Outputs land in `benchmarks/results/`, `YOLOv8-Detection/results/`, and
+`OCR/results/` — all timestamped.
+
+---
+
+## Live UI
+
+The prototype's dashboard, decks page, due-today panel, sidebar deck
+list, and KPI cards all read from a single live source: authored cards
+in `prototype/data.js` plus runtime state in `window.LENS_RUNTIME` (the
+camera captures, LLM-generated cards, and quiz outcomes). Quiz sessions
+and generated cards persist to `localStorage` between page reloads;
+`window.lensExportTrajectories()` downloads the full history as JSONL
+matching the schema in [`ALGORITHMS.md`](ALGORITHMS.md).
 
 ---
 
@@ -131,23 +195,30 @@ cd src/ui
 
 | Name | Role |
 |---|---|
-| **Parthkumar Joshi** | OCR integration, LLM pipeline, UI development, benchmarking |
-| **Alexis Juarez Gomez** | Object detection, dataset collection & annotation, SAM 2 integration, fine-tuning |
+| **Parthkumar Joshi** | Recognition (CLIP), LLM pipeline, UI development, benchmarking framework |
+| **Alexis Juarez Gomez** | Detection (YOLO), OCR pipeline, dataset collection & annotation, visualisations |
 
 ---
 
 ## References
 
 - Jocher, G., et al. (2023). *Ultralytics YOLOv8*. [GitHub](https://github.com/ultralytics/ultralytics)
-- PaddlePaddle Authors. (2022). *PaddleOCR*. [GitHub](https://github.com/PaddlePaddle/PaddleOCR)
+- Radford, A., et al. (2021). *Learning Transferable Visual Models From Natural Language Supervision* (CLIP). ICML.
+- JaidedAI. *EasyOCR*. [GitHub](https://github.com/JaidedAI/EasyOCR)
 - Microsoft Research. (2024). *Phi-3 Technical Report*. [HuggingFace](https://huggingface.co/microsoft/Phi-3-mini-4k-instruct)
-- Ravi, N., et al. (2024). *SAM 2: Segment Anything in Images and Videos*. [GitHub](https://github.com/facebookresearch/segment-anything-2)
+- Ollama. *Local LLM runtime*. [ollama.com](https://ollama.com/)
+- Xenova. *Transformers.js — run Transformers in the browser*. [HuggingFace](https://huggingface.co/docs/transformers.js)
 - Lin, T.-Y., et al. (2014). *Microsoft COCO: Common Objects in Context*. ECCV 2014
-- Zhu, K., et al. (2025). *MultiAgentBench: Evaluating the Collaboration and Competition of LLM Agents*. arXiv
-- Rein, D., et al. (2024). *GAIA: A Benchmark for General AI Assistants*. arXiv
+- Levine, S., et al. (2020). *Offline Reinforcement Learning: Tutorial, Review, and Perspectives*. arXiv:2005.01643.
+- Sunehag, P., et al. (2017). *Value-Decomposition Networks for Cooperative Multi-Agent Learning*. arXiv:1706.05296.
+- Zhu, K., et al. (2025). *MultiAgentBench: Evaluating the Collaboration and Competition of LLM Agents*. arXiv.
+- Rein, D., et al. (2024). *GAIA: A Benchmark for General AI Assistants*. arXiv.
 
 ---
 
 ## License
 
-This project is for academic/research purposes.
+Research / academic use. Scraped third-party images in
+`YOLOv8-Detection/dataset/images/raw/` are not redistributed (see
+[`DATASET.md`](YOLOv8-Detection/DATASET.md)). Generated cards, authored
+cards, code, and benchmark results are project-owned.
